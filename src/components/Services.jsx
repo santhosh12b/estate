@@ -4,23 +4,23 @@ import { ArrowUpRight } from 'lucide-react';
 const servicesList = [
   {
     number: '01',
-    title: 'Residential Properties',
-    description: 'Carefully curated portfolio of architectural villas, contemporary homes, and scenic hillside estates.',
+    title: 'DTCP & RERA Approved Layouts',
+    description: '100% government-sanctioned residential layouts with 33ft/30ft blacktop tar roads, avenue plantations, and gated infrastructure.',
   },
   {
     number: '02',
-    title: 'Property Consultation',
-    description: 'Objective guidance on architectural orientation, land verification, master planning, and long-term livability.',
+    title: '100% Clear Title & Patta Transfer',
+    description: 'Rigorous 30-year legal parent document verification, encumbrance check, and prompt individual Patta name transfer assistance.',
   },
   {
     number: '03',
-    title: 'Site Visit Assistance',
-    description: 'Personalized private walkthroughs scheduled at your convenience to experience lighting, ventilation, and surroundings.',
+    title: 'Free Site Visit with Cab Pickup',
+    description: 'Complimentary private pick-up and drop cab facility for families to inspect layouts, road networks, and ground water in person.',
   },
   {
     number: '04',
-    title: 'Buying Guidance',
-    description: 'Clear documentation, transparent title scrutiny, and smooth transactional support from start to keys.',
+    title: 'Up to 80% Bank Loan Assistance',
+    description: 'Direct tie-ups with SBI, HDFC, LIC HFL, and leading nationalized banks for fast, hassle-free plot loan approvals.',
   },
 ];
 
@@ -32,10 +32,10 @@ const Services = ({ onServiceSelect }) => {
         {/* Section Header */}
         <div className="max-w-xl mb-8 sm:mb-16">
           <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase text-brand-accent block mb-2 sm:mb-3">
-            CAPABILITIES
+            PROMOTER ADVANTAGES
           </span>
           <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-display font-medium text-brand-dark tracking-[-0.02em] leading-tight">
-            Comprehensive Services
+            Infrastructure & Buyer Services
           </h2>
         </div>
 

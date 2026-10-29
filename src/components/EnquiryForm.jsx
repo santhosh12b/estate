@@ -8,9 +8,9 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
     phoneNumber: '',
     email: '',
     preferredLocation: prefilledProperty?.location || 'Coimbatore',
-    propertyType: prefilledProperty?.propertyType || 'Villa',
-    budget: prefilledProperty?.startingPrice ? `Starting ${prefilledProperty.startingPrice}` : '₹1.5 Cr – ₹3.0 Cr',
-    message: prefilledProperty ? `I am interested in exploring ${prefilledProperty.name} (${prefilledProperty.location}). Please provide further details.` : ''
+    propertyType: prefilledProperty?.propertyType || 'Gated Community Plots',
+    budget: prefilledProperty?.startingPrice ? `Starting ${prefilledProperty.startingPrice}` : '₹20 Lakhs – ₹35 Lakhs',
+    message: prefilledProperty ? `I would like to book a free site visit for ${prefilledProperty.name} (${prefilledProperty.location}). Please provide the layout map and bank loan details.` : ''
   });
 
   const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
@@ -54,8 +54,8 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
         phoneNumber: '',
         email: '',
         preferredLocation: 'Coimbatore',
-        propertyType: 'Villa',
-        budget: '₹1.5 Cr – ₹3.0 Cr',
+        propertyType: 'Gated Community Plots',
+        budget: '₹20 Lakhs – ₹35 Lakhs',
         message: ''
       });
     } catch (err) {
@@ -77,26 +77,32 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
           <div className="lg:col-span-5 flex flex-col justify-between">
             <div>
               <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase text-brand-accent block mb-2 sm:mb-3">
-                DIRECT CONSULTATION
+                DIRECT PROMOTER CONSULTATION
               </span>
               <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-display font-medium text-brand-dark tracking-[-0.02em] leading-tight mb-4">
-                Let's Find Your Next Property.
+                Plan Your Land Investment.
               </h2>
               <p className="font-sans text-brand-muted text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed mb-8 font-normal" style={{ color: '#555555' }}>
-                Tell us what you are looking for, and we will help you explore suitable options.
+                Connect directly with the Kubera Vasal team to book a free site inspection with cab pickup, check live plot availability, or review 100% legal title documents.
               </p>
 
               <div className="space-y-4 pt-4 border-t border-brand-divider/80">
                 <div className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-dark mt-2"></span>
                   <p className="font-sans text-[13px] sm:text-[14px] text-brand-muted m-0">
-                    <strong className="text-brand-dark font-medium">Bespoke Architectural Advice:</strong> Review master floor plans, daylight orientation, and verified titles.
+                    <strong className="text-brand-dark font-medium">DTCP & RERA Approved Layouts:</strong> Government-approved layout sanctions, 33ft/30ft tar roads, and individual sweet water tap connections.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-dark mt-2"></span>
                   <p className="font-sans text-[13px] sm:text-[14px] text-brand-muted m-0">
-                    <strong className="text-brand-dark font-medium">Private Site Walkthroughs:</strong> Schedule exclusive on-site visits across Coimbatore, Karamadai, Annur & Kovilpalayam.
+                    <strong className="text-brand-dark font-medium">Free Cab Pickup & Drop:</strong> Complimentary private transportation arranged for you and your family to visit the plots on-ground.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-dark mt-2"></span>
+                  <p className="font-sans text-[13px] sm:text-[14px] text-brand-muted m-0">
+                    <strong className="text-brand-dark font-medium">Up to 80% Bank Loan Support:</strong> Quick sanctions and transparent processing with SBI, HDFC, LIC HFL, and leading banks.
                   </p>
                 </div>
               </div>
@@ -104,7 +110,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
 
             <div className="mt-8 pt-6 border-t border-brand-divider/60 hidden lg:block">
               <span className="font-sans text-[10px] tracking-widest uppercase text-brand-light-muted block mb-1">Direct Assistance</span>
-              <span className="font-sans text-sm font-semibold text-brand-dark">+91 98422 12345 • concierge@estate.com</span>
+              <span className="font-sans text-sm font-semibold text-brand-dark">+91 98422 12345 • contact@kuberavasal.in</span>
             </div>
           </div>
 
@@ -218,7 +224,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                   {/* Property Type */}
                   <div>
                     <label htmlFor="propertyType" className="block text-[11px] uppercase tracking-wider font-semibold text-brand-dark mb-2">
-                      Property Type
+                      Layout / Plot Type
                     </label>
                     <select
                       id="propertyType"
@@ -228,11 +234,11 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                       className="w-full bg-brand-white text-brand-dark text-base sm:text-sm px-3 py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors cursor-pointer"
                       disabled={status === 'submitting'}
                     >
-                      <option value="Villa">Villa</option>
-                      <option value="Contemporary Residence">Contemporary Residence</option>
-                      <option value="Penthouse">Penthouse</option>
-                      <option value="Architectural Plot">Architectural Plot</option>
-                      <option value="Any Type">Any Type</option>
+                      <option value="Gated Community Plots">Gated Community Plots</option>
+                      <option value="Residential Villa Plots">Residential Villa Plots</option>
+                      <option value="Commercial & Villa Sites">Commercial & Villa Sites</option>
+                      <option value="Farm & Villa Sites">Farm & Villa Sites</option>
+                      <option value="Any Plot Type">Any Plot Type</option>
                     </select>
                   </div>
 
@@ -249,9 +255,10 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                       className="w-full bg-brand-white text-brand-dark text-base sm:text-sm px-3 py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors cursor-pointer"
                       disabled={status === 'submitting'}
                     >
-                      <option value="Under ₹1.5 Cr">Under ₹1.5 Cr</option>
-                      <option value="₹1.5 Cr – ₹3.0 Cr">₹1.5 Cr – ₹3.0 Cr</option>
-                      <option value="Above ₹3.0 Cr">Above ₹3.0 Cr</option>
+                      <option value="Under ₹20 Lakhs">Under ₹20 Lakhs</option>
+                      <option value="₹20 Lakhs – ₹35 Lakhs">₹20 Lakhs – ₹35 Lakhs</option>
+                      <option value="₹35 Lakhs – ₹50 Lakhs">₹35 Lakhs – ₹50 Lakhs</option>
+                      <option value="Above ₹50 Lakhs">Above ₹50 Lakhs</option>
                       <option value="Flexible">Flexible</option>
                     </select>
                   </div>
@@ -260,7 +267,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                 {/* Message */}
                 <div>
                   <label htmlFor="message" className="block text-[11px] uppercase tracking-wider font-semibold text-brand-dark mb-2">
-                    Message / Specific Preferences
+                    Message / Free Site Visit Schedule
                   </label>
                   <textarea
                     id="message"
@@ -268,7 +275,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                     rows={3}
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Tell us about your spatial requirements, preferred move-in timeline, or specific architectural features..."
+                    placeholder="Tell us about your preferred plot dimensions in Cents, scheduled date for on-ground site inspection, or questions..."
                     className="w-full bg-brand-white text-brand-dark text-base sm:text-sm px-4 py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors resize-y"
                     disabled={status === 'submitting'}
                   ></textarea>
@@ -286,11 +293,11 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                     {status === 'submitting' ? (
                       <>
                         <Loader2 size={16} className="animate-spin" />
-                        <span>Submitting Enquiry...</span>
+                        <span>Sending Request...</span>
                       </>
                     ) : (
                       <>
-                        <span>Submit Enquiry</span>
+                        <span>Book Free Site Visit / Submit Request</span>
                         <ArrowRight size={15} />
                       </>
                     )}

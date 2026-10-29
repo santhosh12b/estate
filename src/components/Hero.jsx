@@ -31,8 +31,8 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
         {/* Architectural Photograph Layer */}
         <div className="absolute top-0 right-0 w-full lg:w-[72%] h-full z-0 select-none pointer-events-none">
           <img 
-            src="/images/hero-villa.jpg" 
-            alt="Modern contemporary luxury villa architecture" 
+            src="/images/kubera-hero-layout.jpg" 
+            alt="DTCP and RERA approved gated community residential layout plots in Coimbatore" 
             className="w-full h-full object-cover object-center lg:object-[60%_center]"
             loading="eager"
             fetchpriority="high"
@@ -59,7 +59,7 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
             >
               <span className="w-5 sm:w-6 h-[1.5px] bg-brand-accent"></span>
               <span className="font-sans text-[11px] sm:text-xs font-semibold tracking-[0.18em] uppercase text-brand-accent">
-                THOUGHTFULLY DESIGNED SPACES
+                DTCP & RERA APPROVED RESIDENTIAL PLOTS
               </span>
             </motion.div>
 
@@ -69,11 +69,11 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="font-display font-medium text-brand-dark tracking-[-0.03em] leading-[1.12] mb-4 sm:mb-8 text-[38px] sm:text-[42px] lg:text-[58px] xl:text-[64px]"
-              style={{ maxWidth: '440px' }}
+              style={{ maxWidth: '480px' }}
             >
-              Built for <br />
-              <span className="font-semibold text-black">Modern</span> <br />
-              Living
+              Own Your Land. <br />
+              <span className="font-semibold text-black">Build Your</span> <br />
+              Legacy.
             </motion.h1>
 
             {/* Supporting Paragraph: 15–17px desktop, 14–16px mobile (Inter) */}
@@ -81,11 +81,32 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="font-sans text-brand-muted text-[14px] sm:text-[15px] lg:text-[16px] xl:text-[17px] leading-relaxed mb-6 sm:mb-10 font-normal max-w-sm sm:max-w-md"
+              className="font-sans text-brand-muted text-[14px] sm:text-[15px] lg:text-[16px] xl:text-[17px] leading-relaxed mb-6 sm:mb-8 font-normal max-w-sm sm:max-w-lg"
               style={{ color: '#555555' }}
             >
-              Discover modern property solutions designed to support confident decisions, simplify the buying process, and create lasting value for every step forward.
+              Premium gated community layout plots in Coimbatore, Karamadai, Annur & Kovilpalayam. Clear legal titles, 33ft blacktop tar roads, sweet drinking water, and up to 80% bank loan approval.
             </motion.p>
+
+            {/* Plot Highlights Pill Strip */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-wrap items-center gap-2 mb-6 sm:mb-8 text-[11px] sm:text-xs font-semibold text-brand-dark"
+            >
+              <span className="inline-flex items-center gap-1.5 bg-brand-canvas px-3 py-1.5 border border-brand-divider/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                100% DTCP & RERA Approved
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-brand-canvas px-3 py-1.5 border border-brand-divider/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                Immediate Patta Transfer
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-brand-canvas px-3 py-1.5 border border-brand-divider/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                Up to 80% Bank Loan
+              </span>
+            </motion.div>
 
             {/* CTAs (Inter) */}
             <motion.div
@@ -96,9 +117,9 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
             >
               <button
                 onClick={handleScrollToProperties}
-                className="btn-architectural w-full sm:w-auto h-12 sm:h-[48px] min-w-[150px] text-[13px] sm:text-[14px] font-sans font-medium uppercase tracking-wider shadow-sm hover:shadow-md transition-all group"
+                className="btn-architectural w-full sm:w-auto h-12 sm:h-[48px] min-w-[160px] text-[13px] sm:text-[14px] font-sans font-medium uppercase tracking-wider shadow-sm hover:shadow-md transition-all group"
               >
-                <span>Get Started</span>
+                <span>Explore Plots</span>
                 <span className="ml-2 transition-transform duration-300 group-hover:translate-y-0.5">↓</span>
               </button>
 
@@ -111,7 +132,7 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
                 }}
                 className="hidden sm:inline-flex items-center text-[13px] sm:text-[14px] font-sans tracking-wider uppercase font-semibold text-brand-dark hover:text-brand-accent transition-colors"
               >
-                <span>Learn More</span>
+                <span>About Kubera Vasal</span>
                 <span className="ml-1 text-base">→</span>
               </button>
             </motion.div>

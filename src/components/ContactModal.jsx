@@ -9,8 +9,8 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
     phoneNumber: '',
     email: '',
     preferredLocation: 'Coimbatore',
-    propertyType: 'Villa',
-    budget: '₹1.5 Cr – ₹3.0 Cr',
+    propertyType: 'Gated Community Plots',
+    budget: '₹20 Lakhs – ₹35 Lakhs',
     message: ''
   });
 
@@ -27,16 +27,16 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
           phoneNumber: '',
           email: '',
           preferredLocation: prefilledProperty.location || 'Coimbatore',
-          propertyType: prefilledProperty.propertyType || 'Villa',
-          budget: prefilledProperty.startingPrice ? `Starting ${prefilledProperty.startingPrice}` : '₹1.5 Cr – ₹3.0 Cr',
-          message: `I am interested in exploring ${prefilledProperty.name} (${prefilledProperty.location}). Please provide master floor plans and schedule a private consultation.`
+          propertyType: prefilledProperty.propertyType || 'Gated Community Plots',
+          budget: prefilledProperty.startingPrice ? `Starting ${prefilledProperty.startingPrice}` : '₹20 Lakhs – ₹35 Lakhs',
+          message: `I would like to book a free site visit for ${prefilledProperty.name} (${prefilledProperty.location}). Please provide the layout map, available plot numbers, and bank loan details.`
         });
       } else {
         setFormData(prev => ({
           ...prev,
           preferredLocation: prev.preferredLocation || 'Coimbatore',
-          propertyType: prev.propertyType || 'Villa',
-          budget: prev.budget || '₹1.5 Cr – ₹3.0 Cr'
+          propertyType: prev.propertyType || 'Gated Community Plots',
+          budget: prev.budget || '₹20 Lakhs – ₹35 Lakhs'
         }));
       }
       setStatus('idle');
@@ -137,10 +137,10 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
           <div className="flex items-center justify-between px-5 sm:px-8 py-4 sm:py-5 border-b border-brand-divider bg-brand-white sticky top-0 z-20">
             <div>
               <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase text-brand-accent block">
-                DIRECT CONSULTATION
+                FREE SITE VISIT & CONSULTATION
               </span>
               <h2 className="text-xl sm:text-2xl font-display font-semibold text-brand-dark tracking-tight">
-                {prefilledProperty ? `Enquire About ${prefilledProperty.name}` : "Let's Find Your Next Property"}
+                {prefilledProperty ? `Book Site Visit: ${prefilledProperty.name}` : "Book Free Site Visit / Plot Consultation"}
               </h2>
             </div>
 
@@ -308,11 +308,11 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
                       className="w-full bg-brand-canvas text-brand-dark text-base sm:text-sm px-3 py-2.5 sm:py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors cursor-pointer"
                       disabled={status === 'submitting'}
                     >
-                      <option value="Villa">Villa</option>
-                      <option value="Contemporary Residence">Contemporary Residence</option>
-                      <option value="Penthouse">Penthouse</option>
-                      <option value="Architectural Plot">Architectural Plot</option>
-                      <option value="Any Type">Any Type</option>
+                      <option value="Gated Community Plots">Gated Community Plots</option>
+                      <option value="Residential Villa Plots">Residential Villa Plots</option>
+                      <option value="Commercial & Villa Sites">Commercial & Villa Sites</option>
+                      <option value="Farm & Villa Sites">Farm & Villa Sites</option>
+                      <option value="Any Plot Type">Any Plot Type</option>
                     </select>
                   </div>
 
@@ -329,9 +329,10 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
                       className="w-full bg-brand-canvas text-brand-dark text-base sm:text-sm px-3 py-2.5 sm:py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors cursor-pointer"
                       disabled={status === 'submitting'}
                     >
-                      <option value="Under ₹1.5 Cr">Under ₹1.5 Cr</option>
-                      <option value="₹1.5 Cr – ₹3.0 Cr">₹1.5 Cr – ₹3.0 Cr</option>
-                      <option value="Above ₹3.0 Cr">Above ₹3.0 Cr</option>
+                      <option value="Under ₹20 Lakhs">Under ₹20 Lakhs</option>
+                      <option value="₹20 Lakhs – ₹35 Lakhs">₹20 Lakhs – ₹35 Lakhs</option>
+                      <option value="₹35 Lakhs – ₹50 Lakhs">₹35 Lakhs – ₹50 Lakhs</option>
+                      <option value="Above ₹50 Lakhs">Above ₹50 Lakhs</option>
                       <option value="Flexible">Flexible</option>
                     </select>
                   </div>
@@ -340,7 +341,7 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
                 {/* Message */}
                 <div>
                   <label htmlFor="modalMessage" className="block text-[11px] uppercase tracking-wider font-semibold text-brand-dark mb-1.5">
-                    Message / Spatial Preferences
+                    Message / Free Site Visit Schedule
                   </label>
                   <textarea
                     id="modalMessage"
@@ -348,7 +349,7 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
                     rows={2}
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Tell us about your requirements, preferred layout, or timeline..."
+                    placeholder="Tell us your preferred date for site inspection, cab pickup point, or questions..."
                     className="w-full bg-brand-canvas text-brand-dark text-base sm:text-sm px-3.5 py-2.5 border border-brand-divider outline-none focus:border-brand-dark transition-colors resize-y"
                     disabled={status === 'submitting'}
                   ></textarea>
@@ -357,7 +358,7 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
                 {/* Privacy Guarantee Note */}
                 <div className="flex items-center gap-2 text-[11px] text-brand-muted">
                   <ShieldCheck size={14} className="text-brand-accent shrink-0" />
-                  <span>Your contact details are strictly confidential and shared only with your personal advisor.</span>
+                  <span>100% verified legal documents & complimentary cab pickup arranged upon booking.</span>
                 </div>
 
                 {/* Submit Action */}
@@ -372,11 +373,11 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
                     {status === 'submitting' ? (
                       <>
                         <Loader2 size={16} className="animate-spin" />
-                        <span>Sending Enquiry...</span>
+                        <span>Sending Request...</span>
                       </>
                     ) : (
                       <>
-                        <span>Submit Consultation Request</span>
+                        <span>Book Free Site Visit / Send Enquiry</span>
                         <ArrowRight size={15} />
                       </>
                     )}

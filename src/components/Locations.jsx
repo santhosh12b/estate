@@ -11,14 +11,14 @@ const Locations = ({ onSelectLocation }) => {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6">
           <div className="max-w-xl">
             <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase text-brand-accent block mb-2 sm:mb-3">
-              GEOGRAPHICAL PRESENCE
+              KEY GROWTH CORRIDORS
             </span>
             <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-display font-medium text-brand-dark tracking-[-0.02em] leading-tight">
-              Find the Right Location.
+              Prime Plot Locations
             </h2>
           </div>
           <p className="font-sans text-[14px] sm:text-[15px] text-brand-muted leading-relaxed max-w-sm">
-            Each territory offers distinct climatic advantages, architectural connectivity, and serene residential character.
+            High-appreciation residential layout corridors in Coimbatore, Karamadai, Annur & Kovilpalayam with ready infrastructure.
           </p>
         </div>
 
@@ -43,14 +43,14 @@ const Locations = ({ onSelectLocation }) => {
 
               {/* Top Verified Count Tag */}
               <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs text-brand-dark font-sans text-[11px] font-semibold tracking-wider px-2.5 py-1">
-                {loc.count} Verified {loc.count === 1 ? 'Project' : 'Projects'}
+                {loc.count} Approved {loc.count === 1 ? 'Layout' : 'Layouts'}
               </div>
 
               {/* Bottom Details */}
               <div className="absolute bottom-0 left-0 w-full p-6 text-white flex flex-col justify-end">
                 <div className="flex items-center gap-1.5 font-sans text-xs text-white/80 mb-1">
                   <MapPin size={12} className="text-brand-accent" />
-                  <span className="tracking-widest uppercase text-[10px]">Region</span>
+                  <span className="tracking-widest uppercase text-[10px]">Micro-Market</span>
                 </div>
 
                 <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-1.5 group-hover:text-brand-accent transition-colors">
@@ -62,7 +62,7 @@ const Locations = ({ onSelectLocation }) => {
                 </p>
 
                 <div className="flex items-center gap-1.5 font-sans text-[12px] sm:text-[13px] font-semibold tracking-wider uppercase text-white group-hover:underline">
-                  <span>Explore Location</span>
+                  <span>Explore Layouts</span>
                   <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </div>
               </div>

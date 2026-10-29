@@ -11,7 +11,7 @@ const MobileStickyBar = ({ onContactClick, isHidden = false }) => {
     >
       {/* 1. Quick WhatsApp Concierge Button */}
       <a
-        href="https://wa.me/919842212345?text=Hello%20ESTATE%20Team,%20I%20am%20interested%20in%20inquiring%20about%20your%20properties."
+        href="https://wa.me/919842212345?text=Hello%20Kubera%20Vasal%20Team,%20I%20am%20interested%20in%20inquiring%20about%20your%20approved%20plots%20and%20booking%20a%20site%20visit."
         target="_blank"
         rel="noopener noreferrer"
         className="h-11 px-3.5 bg-brand-canvas hover:bg-brand-canvas/80 text-brand-dark border border-brand-divider flex items-center justify-center gap-1.5 font-sans text-[12px] font-semibold uppercase tracking-wider shrink-0 transition-colors"
@@ -30,14 +30,14 @@ const MobileStickyBar = ({ onContactClick, isHidden = false }) => {
         <Phone size={15} />
       </a>
 
-      {/* 3. Prominent Black 'Contact Us' Popup Trigger Button */}
+      {/* 3. Prominent Black 'Book Site Visit' Popup Trigger Button */}
       <button
         onClick={onContactClick}
         className="btn-architectural flex-1 h-11 text-[13px] font-sans uppercase tracking-wider font-semibold flex items-center justify-center gap-2 shadow-xs"
         aria-label="Open contact consultation popup"
       >
         <Mail size={14} />
-        <span>Contact Us</span>
+        <span>Book Site Visit</span>
         <ArrowUpRight size={14} />
       </button>
     </aside>

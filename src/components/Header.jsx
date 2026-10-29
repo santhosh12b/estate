@@ -36,7 +36,7 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'About', href: '#about' },
-    { name: 'Properties', href: '#properties' },
+    { name: 'Plots & Layouts', href: '#properties' },
     { name: 'Services', href: '#services' },
     { name: 'Locations', href: '#locations' },
   ];
@@ -72,8 +72,8 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
             onClick={(e) => handleNavClick(e, '#home')}
             className="group flex items-center gap-1.5 focus:outline-none"
           >
-            <span className="font-display font-extrabold text-xl sm:text-2xl text-brand-dark tracking-[0.22em] uppercase select-none transition-opacity group-hover:opacity-80">
-              ESTATE
+            <span className="font-display font-extrabold text-lg sm:text-2xl text-brand-dark tracking-[0.16em] sm:tracking-[0.2em] uppercase select-none transition-opacity group-hover:opacity-80">
+              KUBERA VASAL
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-brand-accent mb-0.5"></span>
           </a>
@@ -99,7 +99,7 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
               onClick={onContactClick}
               className="btn-outline-architectural hover:shadow-subtle"
             >
-              <span>Contact Us</span>
+              <span>Book Site Visit</span>
             </button>
           </div>
 
@@ -133,8 +133,8 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
                 onClick={(e) => handleNavClick(e, '#home')}
                 className="flex items-center gap-1.5"
               >
-                <span className="font-display font-extrabold text-xl text-brand-dark tracking-[0.22em] uppercase">
-                  ESTATE
+                <span className="font-display font-extrabold text-xl text-brand-dark tracking-[0.16em] uppercase">
+                  KUBERA VASAL
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-accent mb-0.5"></span>
               </a>
@@ -188,7 +188,7 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
             <div className="pt-6 border-t border-brand-divider space-y-4">
               <div className="text-xs text-brand-muted space-y-1">
                 <span className="text-[10px] uppercase tracking-wider text-brand-light-muted block">Advisory Desk</span>
-                <p className="font-medium text-brand-dark">+91 98422 12345 • concierge@estate.com</p>
+                <p className="font-medium text-brand-dark">+91 98422 12345 • contact@kuberavasal.in</p>
               </div>
 
               <button

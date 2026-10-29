@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, ArrowUpRight, Bed, Maximize, RotateCcw, Filter, Check } from 'lucide-react';
+import { MapPin, ArrowUpRight, Maximize, RotateCcw, ShieldCheck, Compass, Check } from 'lucide-react';
 import { propertyTypesList, budgetRanges } from '../data/properties';
 
 const locations = [
@@ -85,19 +85,19 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-14 gap-4 sm:gap-6">
           <div className="max-w-xl">
             <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase text-brand-accent block mb-2 sm:mb-3">
-              CURATED PORTFOLIO
+              DTCP & RERA APPROVED SITES
             </span>
             <h2 className="text-[28px] sm:text-[34px] lg:text-[40px] font-display font-medium text-brand-dark tracking-[-0.02em] leading-tight mb-2 sm:mb-3">
-              Explore Our Properties
+              Featured Residential Layouts
             </h2>
             <p className="font-sans text-brand-muted text-[14px] sm:text-[15px] lg:text-[16px] leading-relaxed font-normal">
-              Discover thoughtfully selected properties designed around your lifestyle and future plans.
+              Explore 100% legally verified residential plots and gated layout developments ready for instant home construction and high capital appreciation.
             </p>
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-divider/50">
             <span className="text-xs uppercase tracking-wider text-brand-muted">
-              Displaying <strong className="text-brand-dark font-bold">{filteredProperties.length}</strong> of {properties.length} Residences
+              Displaying <strong className="text-brand-dark font-bold">{filteredProperties.length}</strong> of {properties.length} Layouts
             </span>
             {isFiltered && (
               <button
@@ -216,13 +216,17 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
                     />
                     
                     {/* Status / Category Tag */}
-                    <div className="absolute top-4 left-4 bg-brand-white/95 backdrop-blur-xs px-2.5 py-1 text-[10px] font-semibold tracking-widest uppercase text-brand-dark shadow-xs">
-                      {property.propertyType}
+                    <div className="absolute top-4 left-4 bg-brand-white/95 backdrop-blur-xs px-2.5 py-1 text-[10px] font-semibold tracking-widest uppercase text-brand-dark shadow-xs flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                      <span>{property.approvals || property.propertyType}</span>
                     </div>
 
                     {/* Price Pill */}
-                    <div className="absolute bottom-4 right-4 bg-brand-btn text-white px-3 py-1 text-xs font-semibold tracking-wide">
-                      {property.startingPrice}
+                    <div className="absolute bottom-4 right-4 bg-brand-btn text-white px-3 py-1.5 text-xs font-semibold tracking-wide flex flex-col items-end">
+                      <span>{property.startingPrice}</span>
+                      {property.pricePerCent && (
+                        <span className="text-[9px] font-normal text-white/80">{property.pricePerCent}</span>
+                      )}
                     </div>
                   </div>
 
@@ -248,20 +252,19 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
 
                     {/* Specifications Bar (Inter) */}
                     <div className="pt-4 border-t border-brand-divider/60 flex items-center justify-between">
-                      <div className="flex items-center gap-3 font-sans text-[12px] sm:text-[13px] uppercase tracking-wider text-brand-light-muted font-medium">
-                        <span className="flex items-center gap-1">
-                          <Maximize size={12} />
-                          {property.area}
+                      <div className="flex items-center gap-2.5 font-sans text-[12px] sm:text-[13px] uppercase tracking-wider text-brand-light-muted font-medium">
+                        <span className="flex items-center gap-1 text-brand-dark font-semibold">
+                          <Maximize size={12} className="text-brand-accent" />
+                          {property.plotSizeCents || property.area}
                         </span>
                         <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Bed size={12} />
-                          {property.bedrooms > 0 ? `${property.bedrooms} Beds` : 'Estate Plot'}
+                        <span className="text-brand-muted">
+                          {property.roadWidth || '33ft Road'}
                         </span>
                       </div>
 
                       <span className="inline-flex items-center font-sans text-[13px] sm:text-[14px] font-semibold text-brand-dark group-hover:text-brand-accent transition-colors">
-                        <span>View Details</span>
+                        <span>View Layout</span>
                         <ArrowUpRight size={14} className="ml-0.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                       </span>
                     </div>
