@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-canvas: #F7F7F4;
+    --brand-white: #FFFFFF;
+    --brand-dark: #111111;
+    --brand-muted: #666666;
+    --brand-btn: #111A18;
+    --brand-divider: #D9D9D5;
+    --brand-accent: #B8A58A;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--brand-canvas);
+    color: var(--brand-dark);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--brand-canvas);
+    color: var(--brand-dark);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+}
+
+@layer components {
+  /* Full Screen Website Container */
+  .site-canvas {
+    @apply w-full bg-brand-white min-h-screen flex flex-col;
+  }
+
+  /* Thin Divider */
+  .thin-divider {
+    border-bottom: 1px solid var(--brand-divider);
+  }
+
+  /* Rectangular architectural button */
+  .btn-architectural {
+    @apply inline-flex items-center justify-center bg-brand-btn text-white text-[13px] sm:text-[14px] font-sans font-medium tracking-wider uppercase px-6 py-3 transition-all duration-300 hover:bg-black active:scale-[0.98] select-none;
+  }
+
+  .btn-outline-architectural {
+    @apply inline-flex items-center justify-center border border-brand-dark text-brand-dark bg-transparent text-[13px] sm:text-[14px] font-sans font-medium tracking-wider uppercase px-5 py-2.5 transition-all duration-300 hover:bg-brand-dark hover:text-white active:scale-[0.98] select-none;
+  }
+}
+
+/* Custom sleek subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F7F4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D9D9D5;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8A58A;
+}
