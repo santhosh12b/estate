@@ -20,7 +20,10 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  const databaseUrl = process.env.DATABASE_URL || 
+    process.env.POSTGRES_URL || 
+    process.env.NEON_URL || 
+    process.env.STORAGE_URL;
   const isDbConfigured = Boolean(
     databaseUrl && !databaseUrl.includes('user:password') && !databaseUrl.includes('placeholder')
   );

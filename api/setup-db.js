@@ -8,11 +8,14 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  const databaseUrl = process.env.DATABASE_URL || 
+    process.env.POSTGRES_URL || 
+    process.env.NEON_URL || 
+    process.env.STORAGE_URL;
   if (!databaseUrl || databaseUrl.includes('user:password')) {
     return res.status(400).json({
       success: false,
-      error: 'DATABASE_URL or POSTGRES_URL is not configured in Vercel environment variables. Please connect your Neon integration or add your connection string.'
+      error: 'Database connection URL is not configured in Vercel environment variables. Please connect your Neon integration or add your connection string.'
     });
   }
 
