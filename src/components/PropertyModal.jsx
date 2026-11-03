@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Check, ArrowRight, Maximize, ShieldCheck, Compass, Car } from 'lucide-react';
+import { X, MapPin, Check, ArrowRight, Maximize, ShieldCheck, Compass, Car, Play } from 'lucide-react';
 
-const PropertyModal = ({ property, onClose, onEnquire }) => {
+const PropertyModal = ({ property, onClose, onEnquire, onWatchVideo }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
@@ -12,7 +12,7 @@ const PropertyModal = ({ property, onClose, onEnquire }) => {
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [property, onClose]);
@@ -54,6 +54,18 @@ const PropertyModal = ({ property, onClose, onEnquire }) => {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               <span>{property.approvals || property.propertyType}</span>
             </div>
+
+            {/* Layout Video Tour Pill */}
+            {property.hasVideoTour && (
+              <button
+                type="button"
+                onClick={() => onWatchVideo && onWatchVideo(property)}
+                className="absolute bottom-4 right-4 bg-brand-white/95 hover:bg-white text-brand-dark px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-lg transition-transform hover:scale-105 cursor-pointer"
+              >
+                <Play size={14} className="fill-brand-btn text-brand-btn" />
+                <span>Watch Drone Video Tour</span>
+              </button>
+            )}
           </div>
 
           {/* Modal Content */}
@@ -88,7 +100,7 @@ const PropertyModal = ({ property, onClose, onEnquire }) => {
                 </div>
                 <div>
                   <span className="text-[10px] uppercase tracking-wider text-brand-muted block">Plot Sizes</span>
-                  <span className="font-semibold text-xs sm:text-sm text-brand-dark">{property.plotSizeCents || property.area}</span>
+                  <span className="font-semibold text-xs sm:text-sm text-brand-dark">1.75 to 8.0 Cents</span>
                 </div>
               </div>
 
@@ -107,8 +119,8 @@ const PropertyModal = ({ property, onClose, onEnquire }) => {
                   <ShieldCheck size={18} className="text-emerald-700" />
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-brand-muted block">Approval Authority</span>
-                  <span className="font-semibold text-xs sm:text-sm text-brand-dark">{property.approvals || 'DTCP & RERA Approved'}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-brand-muted block">Bank Loan & Approvals</span>
+                  <span className="font-semibold text-xs sm:text-sm text-brand-dark">80% – 90% Loan (All Banks)</span>
                 </div>
               </div>
             </div>
@@ -145,16 +157,29 @@ const PropertyModal = ({ property, onClose, onEnquire }) => {
                 <span>Free cab pickup & drop available for on-site family inspection.</span>
               </div>
 
-              <button
-                onClick={() => {
-                  onClose();
-                  if (onEnquire) onEnquire(property);
-                }}
-                className="btn-architectural w-full sm:w-auto h-11 px-8 text-[13px] sm:text-[14px] font-sans uppercase tracking-wider font-medium flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Book Free Site Visit</span>
-                <ArrowRight size={14} />
-              </button>
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                {property.hasVideoTour && (
+                  <button
+                    type="button"
+                    onClick={() => onWatchVideo && onWatchVideo(property)}
+                    className="btn-outline-architectural flex-1 sm:flex-none h-11 px-5 text-[13px] sm:text-[14px] font-sans uppercase tracking-wider font-medium flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Play size={14} className="fill-brand-dark" />
+                    <span>Video Tour</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onEnquire) onEnquire(property);
+                  }}
+                  className="btn-architectural flex-1 sm:flex-none h-11 px-8 text-[13px] sm:text-[14px] font-sans uppercase tracking-wider font-medium flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Book Free Site Visit</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
             </div>
 
           </div>

@@ -10,7 +10,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
     preferredLocation: prefilledProperty?.location || 'Coimbatore',
     propertyType: prefilledProperty?.propertyType || 'Gated Community Plots',
     budget: prefilledProperty?.startingPrice ? `Starting ${prefilledProperty.startingPrice}` : '₹20 Lakhs – ₹35 Lakhs',
-    message: prefilledProperty ? `I would like to book a free site visit for ${prefilledProperty.name} (${prefilledProperty.location}). Please provide the layout map and bank loan details.` : ''
+    message: prefilledProperty ? `I would like to book a free site visit for ${prefilledProperty.name} (${prefilledProperty.location}). Please provide the layout map, available plot numbers (1.75 to 8.0 Cents), and 80%-90% bank loan details.` : ''
   });
 
   const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
@@ -23,7 +23,6 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
   };
 
   const handlePhoneChange = (e) => {
-    // Only allow numbers and plus symbol
     const cleaned = e.target.value.replace(/[^0-9+ ]/g, '');
     setFormData(prev => ({ ...prev, phoneNumber: cleaned }));
   };
@@ -61,7 +60,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
     } catch (err) {
       console.error(err);
       setStatus('error');
-      setErrorMessage('There was a temporary problem dispatching your enquiry. Please check your connection or contact us via WhatsApp.');
+      setErrorMessage('There was a temporary problem dispatching your enquiry. Please check your connection or contact our advisory desk directly.');
     } finally {
       isSubmittingRef.current = false;
     }
@@ -83,34 +82,34 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                 Plan Your Land Investment.
               </h2>
               <p className="font-sans text-brand-muted text-[15px] sm:text-[16px] lg:text-[17px] leading-relaxed mb-8 font-normal" style={{ color: '#555555' }}>
-                Connect directly with the Kubera Vasal team to book a free site inspection with cab pickup, check live plot availability, or review 100% legal title documents.
+                Connect directly with the <strong>Gubera Vasal</strong> team to book a free site inspection with cab pickup, check live plot availability (<strong>1.75 to 8.0 Cents</strong>), or review 100% legal title documents.
               </p>
 
               <div className="space-y-4 pt-4 border-t border-brand-divider/80">
                 <div className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-dark mt-2"></span>
                   <p className="font-sans text-[13px] sm:text-[14px] text-brand-muted m-0">
-                    <strong className="text-brand-dark font-medium">DTCP & RERA Approved Layouts:</strong> Government-approved layout sanctions, 33ft/30ft tar roads, and individual sweet water tap connections.
+                    <strong className="text-brand-dark font-medium">Over 14 Layouts in Coimbatore Region:</strong> Prime residential layouts across Coimbatore, Karamadai, Annur, Kovilpalayam, Pollachi, and upcoming Avinashi bypass.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-dark mt-2"></span>
                   <p className="font-sans text-[13px] sm:text-[14px] text-brand-muted m-0">
-                    <strong className="text-brand-dark font-medium">Free Cab Pickup & Drop:</strong> Complimentary private transportation arranged for you and your family to visit the plots on-ground.
+                    <strong className="text-brand-dark font-medium">80% to 90% Bank Loan Approved:</strong> Direct loan approval arrangements with all major nationalized and private banks with minimal paperwork.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-dark mt-2"></span>
                   <p className="font-sans text-[13px] sm:text-[14px] text-brand-muted m-0">
-                    <strong className="text-brand-dark font-medium">Up to 80% Bank Loan Support:</strong> Quick sanctions and transparent processing with SBI, HDFC, LIC HFL, and leading banks.
+                    <strong className="text-brand-dark font-medium">Free Cab Pickup & Drop:</strong> Complimentary private transportation arranged for you and your family to inspect layout developments on-ground.
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="mt-8 pt-6 border-t border-brand-divider/60 hidden lg:block">
-              <span className="font-sans text-[10px] tracking-widest uppercase text-brand-light-muted block mb-1">Direct Assistance</span>
-              <span className="font-sans text-sm font-semibold text-brand-dark">+91 98422 12345 • contact@kuberavasal.in</span>
+              <span className="font-sans text-[10px] tracking-widest uppercase text-brand-light-muted block mb-1">Direct Promoter Desk</span>
+              <span className="font-sans text-sm font-semibold text-brand-dark">+91 98422 12345 • contact@guberavasal.in</span>
             </div>
           </div>
 
@@ -123,7 +122,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                 </div>
                 <h3 className="text-2xl font-display font-semibold text-brand-dark mb-2">Enquiry Received</h3>
                 <p className="text-sm text-brand-muted max-w-md leading-relaxed mb-8">
-                  Thank you for reaching out. Our architectural property advisor will review your preferences and contact you within 24 hours.
+                  Thank you! Our Gubera Vasal plot consultant will review your preferences and contact you within 24 hours to schedule your free site visit with complimentary cab pickup.
                 </p>
                 <button
                   type="button"
@@ -156,7 +155,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                       required
                       value={formData.fullName}
                       onChange={handleChange}
-                      placeholder="e.g. Vikramaditya Rao"
+                      placeholder="e.g. Anandha Krishnan"
                       className="w-full bg-brand-white text-brand-dark text-base sm:text-sm px-4 py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors"
                       disabled={status === 'submitting'}
                     />
@@ -193,7 +192,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="vikram@example.com"
+                    placeholder="anand@example.com"
                     className="w-full bg-brand-white text-brand-dark text-base sm:text-sm px-4 py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors"
                     disabled={status === 'submitting'}
                   />
@@ -213,10 +212,12 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                       className="w-full bg-brand-white text-brand-dark text-base sm:text-sm px-3 py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors cursor-pointer"
                       disabled={status === 'submitting'}
                     >
-                      <option value="Coimbatore">Coimbatore</option>
+                      <option value="Coimbatore">Coimbatore (14 Layouts)</option>
                       <option value="Karamadai">Karamadai</option>
                       <option value="Annur">Annur</option>
                       <option value="Kovilpalayam">Kovilpalayam</option>
+                      <option value="Pollachi">Pollachi</option>
+                      <option value="Avinashi">Avinashi (Coming Soon)</option>
                       <option value="Flexible">Flexible / Open</option>
                     </select>
                   </div>
@@ -237,7 +238,6 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                       <option value="Gated Community Plots">Gated Community Plots</option>
                       <option value="Residential Villa Plots">Residential Villa Plots</option>
                       <option value="Commercial & Villa Sites">Commercial & Villa Sites</option>
-                      <option value="Farm & Villa Sites">Farm & Villa Sites</option>
                       <option value="Any Plot Type">Any Plot Type</option>
                     </select>
                   </div>
@@ -275,7 +275,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                     rows={3}
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Tell us about your preferred plot dimensions in Cents, scheduled date for on-ground site inspection, or questions..."
+                    placeholder="Tell us about your preferred plot dimensions in Cents (1.75 to 8.0 Cents), scheduled date for on-ground site inspection, or questions..."
                     className="w-full bg-brand-white text-brand-dark text-base sm:text-sm px-4 py-3 border border-brand-divider outline-none focus:border-brand-dark transition-colors resize-y"
                     disabled={status === 'submitting'}
                   ></textarea>

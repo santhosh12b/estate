@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Play } from 'lucide-react';
 
-const Hero = ({ onExploreClick, onSelectRegion }) => {
+const Hero = ({ onExploreClick, onSelectRegion, onWatchLegalVideo }) => {
   const handleScrollToProperties = () => {
     if (onExploreClick) {
       onExploreClick();
@@ -20,11 +20,20 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
     }
   };
 
+  const regions = [
+    { name: 'Coimbatore', count: '14' },
+    { name: 'Karamadai', count: '4' },
+    { name: 'Annur', count: '5' },
+    { name: 'Kovilpalayam', count: '3' },
+    { name: 'Pollachi', count: '3' },
+    { name: 'Avinashi', isComingSoon: true }
+  ];
+
   return (
     <section 
       id="home"
       className="relative w-full bg-brand-white overflow-hidden border-b border-brand-divider"
-      style={{ minHeight: 'clamp(640px, 85vh, 840px)' }}
+      style={{ minHeight: 'clamp(640px, 85vh, 860px)' }}
     >
       <div className="relative w-full h-full min-h-[inherit] flex flex-col justify-end lg:justify-center">
         
@@ -84,7 +93,7 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
               className="font-sans text-brand-muted text-[14px] sm:text-[15px] lg:text-[16px] xl:text-[17px] leading-relaxed mb-6 sm:mb-8 font-normal max-w-sm sm:max-w-lg"
               style={{ color: '#555555' }}
             >
-              Premium gated community layout plots in Coimbatore, Karamadai, Annur & Kovilpalayam. Clear legal titles, 33ft blacktop tar roads, sweet drinking water, and up to 80% bank loan approval.
+              Premium gated community layouts and plots across <strong>Coimbatore (14+ Layouts)</strong>, Karamadai, Annur, Kovilpalayam, and Pollachi. Clear legal titles, 33ft blacktop tar roads, and <strong>80% to 90% bank loan approval</strong> from all major banks.
             </motion.p>
 
             {/* Plot Highlights Pill Strip */}
@@ -100,11 +109,11 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
               </span>
               <span className="inline-flex items-center gap-1.5 bg-brand-canvas px-3 py-1.5 border border-brand-divider/80">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                Immediate Patta Transfer
+                Plot Sizes: 1.75 to 8.0 Cents
               </span>
               <span className="inline-flex items-center gap-1.5 bg-brand-canvas px-3 py-1.5 border border-brand-divider/80">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                Up to 80% Bank Loan
+                80% to 90% Bank Loan (All Banks)
               </span>
             </motion.div>
 
@@ -113,7 +122,7 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5"
             >
               <button
                 onClick={handleScrollToProperties}
@@ -124,16 +133,11 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
               </button>
 
               <button
-                onClick={() => {
-                  const about = document.querySelector('#about');
-                  if (about) {
-                    about.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className="hidden sm:inline-flex items-center text-[13px] sm:text-[14px] font-sans tracking-wider uppercase font-semibold text-brand-dark hover:text-brand-accent transition-colors"
+                onClick={() => onWatchLegalVideo ? onWatchLegalVideo() : handleScrollToProperties()}
+                className="inline-flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-sans tracking-wider uppercase font-semibold text-brand-dark hover:text-brand-accent transition-colors border border-brand-divider px-4 py-3 bg-brand-white"
               >
-                <span>About Kubera Vasal</span>
-                <span className="ml-1 text-base">→</span>
+                <Play size={14} className="fill-brand-dark" />
+                <span>Legal Verification Video</span>
               </button>
             </motion.div>
 
@@ -148,13 +152,27 @@ const Hero = ({ onExploreClick, onSelectRegion }) => {
                 Explore Regions:
               </span>
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                {['Coimbatore', 'Karamadai', 'Annur', 'Kovilpalayam'].map((region) => (
+                {regions.map((reg) => (
                   <button
-                    key={region}
-                    onClick={() => onSelectRegion ? onSelectRegion(region) : handleScrollToProperties()}
-                    className="text-[11px] bg-brand-canvas hover:bg-brand-dark hover:text-white text-brand-dark px-3 py-1.5 border border-brand-divider/80 transition-colors font-medium select-none"
+                    key={reg.name}
+                    onClick={() => onSelectRegion ? onSelectRegion(reg.name) : handleScrollToProperties()}
+                    className={`text-[11px] px-3 py-1.5 border transition-all font-medium select-none flex items-center gap-1.5 ${
+                      reg.isComingSoon 
+                        ? 'bg-amber-50/70 border-amber-300 text-amber-900 hover:bg-amber-100'
+                        : 'bg-brand-canvas hover:bg-brand-dark hover:text-white text-brand-dark border-brand-divider/80'
+                    }`}
                   >
-                    {region}
+                    <span>{reg.name}</span>
+                    {reg.count && (
+                      <span className="text-[9px] px-1 py-0.2 rounded-full bg-brand-white/80 font-bold text-brand-dark">
+                        {reg.count}
+                      </span>
+                    )}
+                    {reg.isComingSoon && (
+                      <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full bg-amber-600 text-white font-bold tracking-wider">
+                        Coming Soon
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>

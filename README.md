@@ -1,19 +1,21 @@
-# Kubera Vasal — DTCP & RERA Approved Residential Layouts & Plots
+# Gubera Vasal — DTCP & RERA Approved Residential Layouts & Plots
 
-A modern, high-performance web platform for **Kubera Vasal**, a premier real estate layout promoter specializing in **DTCP & RERA approved residential plots, gated community layouts, villa sites, and farm lands** across Coimbatore, Karamadai, Annur, and Kovilpalayam.
+A modern, high-performance web platform for **Gubera Vasal**, a premier real estate layout promoter specializing in **DTCP & RERA approved residential layouts, gated community plots, and villa sites** across Coimbatore (14+ Layouts), Karamadai, Annur, Kovilpalayam, Pollachi, and upcoming Avinashi corridor.
 
 ## Key Features
 
 - **Architectural & Land Development Focus**: Clean edge-to-edge layout showcasing genuine gated community layout photographs, blacktop tar roads, avenue trees, and demarcated plots in Cents & Sq.Ft.
-- **Micro-Market Coverage**: Coimbatore, Karamadai (Western Ghats foothills), Annur (high-growth economic corridor), and Kovilpalayam (Sathy Road IT belt).
-- **Interactive Plot Exploration**: Instant 1-click filtering by Region, Plot Category, and Budget.
-- **Buyer Facilities**: Up to 80% bank loan assistance (SBI, HDFC, LIC HFL), 100% legal verification, immediate Patta transfer, and complimentary cab pick-up & drop for site visits.
+- **Plot Sizes**: **1.75 to 8.0 Cents** (762 to 3,485 sq.ft).
+- **Extensive Micro-Market Coverage**: Coimbatore (14 Approved Layouts), Karamadai, Annur, Kovilpalayam, Pollachi, and Avinashi (Coming Soon).
+- **Legal Explanation Video**: Dedicated 100% legal scrutiny video guide explaining 30-year parent document searches, DTCP & RERA layout approvals, Nil Encumbrance Certificates (EC), and spot Patta transfer.
+- **Layout Video Tour Attachment**: Drone walkthrough and layout tour on each layout card and layout detail modal.
+- **Buyer Facilities**: **80% to 90% bank loan approval** from all major nationalized and private banks, 100% legal verification, immediate Patta transfer, and complimentary cab pick-up & drop for site visits.
 - **Fast Lead Capture Modal**: Dedicated contact and site visit booking popup integrated directly with Google Apps Script & Google Sheets backend.
 - **Mobile Responsive Design**: 64px mobile header, full-screen overlay navigation, and sticky action bar (WhatsApp, Call, Book Site Visit).
 
 ## Tech Stack
 
-- **Frontend**: React 19, Vite, Tailwind CSS v4
+- **Frontend**: React 19, Vite, Tailwind CSS
 - **Typography**: Manrope (Headings & Display) + Inter (Body & UI)
 - **Icons**: Lucide React
 - **Animations**: Framer Motion

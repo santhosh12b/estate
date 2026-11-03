@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import PropertyModal from './components/PropertyModal';
 import ContactModal from './components/ContactModal';
 import MobileStickyBar from './components/MobileStickyBar';
+import VideoModal from './components/VideoModal';
 import { fetchProjectsFromSheets } from './services/googleSheets';
 import { defaultProperties } from './data/properties';
 
@@ -19,6 +20,8 @@ function App() {
   const [prefilledProperty, setPrefilledProperty] = useState(null);
   const [selectedLocationFilter, setSelectedLocationFilter] = useState('All');
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [videoModalData, setVideoModalData] = useState(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   // Load properties dynamically from Google Sheets if configured
   useEffect(() => {
@@ -41,6 +44,7 @@ function App() {
   };
 
   const handleSelectLocation = (locationName) => {
+    // If Avinashi is selected, we can filter or pre-register interest
     setSelectedLocationFilter(locationName);
     const propertiesSection = document.querySelector('#properties');
     if (propertiesSection) {
@@ -56,6 +60,26 @@ function App() {
 
   const handleEnquireProperty = (prop) => {
     handleContactClick(prop);
+  };
+
+  const handleWatchLegalVideo = () => {
+    setVideoModalData({
+      type: 'legal',
+      title: '100% Legal Title & Document Verification Guide',
+      poster: '/images/kubera-survey-about.jpg',
+      description: 'Step-by-step verification of 30-year parent title deeds, DTCP & RERA layout approvals, Nil Encumbrance Certificates (EC), and individual revenue Patta name transfer in Coimbatore micro-markets.'
+    });
+    setIsVideoModalOpen(true);
+  };
+
+  const handleWatchLayoutVideo = (property) => {
+    setVideoModalData({
+      type: 'layout',
+      title: property.videoTitle || `${property.name} — Drone Walkthrough`,
+      poster: property.imageUrl,
+      description: `Aerial drone walkthrough of ${property.name} in ${property.location}. Featuring 33ft/30ft asphalt tar roads, sweet water facilities, avenue trees, and 80%-90% bank loan approved plots.`
+    });
+    setIsVideoModalOpen(true);
   };
 
   return (
@@ -74,6 +98,7 @@ function App() {
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }} 
             onSelectRegion={handleSelectLocation}
+            onWatchLegalVideo={handleWatchLegalVideo}
           />
 
           {/* 2. Featured Properties Section */}
@@ -82,16 +107,20 @@ function App() {
             onSelectProperty={setSelectedProperty}
             selectedLocationFilter={selectedLocationFilter}
             onLocationFilterChange={setSelectedLocationFilter}
+            onWatchLayoutVideo={handleWatchLayoutVideo}
           />
 
-          {/* 3. About Section */}
-          <About onApproachClick={() => {
-            const el = document.querySelector('#services');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }} />
+          {/* 3. About & Legal Verification Section */}
+          <About 
+            onApproachClick={() => {
+              const el = document.querySelector('#services');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }} 
+            onWatchLegalVideo={handleWatchLegalVideo}
+          />
 
           {/* 4. Services Section */}
-          <Services onServiceSelect={(serviceName) => {
+          <Services onServiceSelect={() => {
             handleContactClick();
           }} />
 
@@ -108,7 +137,7 @@ function App() {
         {/* Mobile View Sticky Action Bar (WhatsApp, Call & Contact Us popup trigger) */}
         <MobileStickyBar 
           onContactClick={() => handleContactClick()}
-          isHidden={isContactModalOpen || !!selectedProperty}
+          isHidden={isContactModalOpen || !!selectedProperty || isVideoModalOpen}
         />
 
         {/* Property Detail Modal */}
@@ -116,6 +145,7 @@ function App() {
           property={selectedProperty}
           onClose={() => setSelectedProperty(null)}
           onEnquire={handleEnquireProperty}
+          onWatchVideo={handleWatchLayoutVideo}
         />
 
         {/* Dedicated Real Estate Contact & Consultation Popup Modal */}
@@ -126,6 +156,16 @@ function App() {
             setPrefilledProperty(null);
           }}
           prefilledProperty={prefilledProperty}
+        />
+
+        {/* Dedicated Legal & Layout Video Player Modal */}
+        <VideoModal
+          isOpen={isVideoModalOpen}
+          onClose={() => {
+            setIsVideoModalOpen(false);
+            setVideoModalData(null);
+          }}
+          videoData={videoModalData}
         />
 
       </div>

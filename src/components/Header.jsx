@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Header = ({ onContactClick, activeSection = 'home' }) => {
+const Header = ({ onContactClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -35,9 +35,9 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
 
   const navLinks = [
     { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
+    { name: 'About & Legal', href: '#about' },
     { name: 'Plots & Layouts', href: '#properties' },
-    { name: 'Services', href: '#services' },
+    { name: 'Infrastructure', href: '#services' },
     { name: 'Locations', href: '#locations' },
   ];
 
@@ -73,19 +73,19 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
             className="group flex items-center gap-1.5 focus:outline-none"
           >
             <span className="font-display font-extrabold text-lg sm:text-2xl text-brand-dark tracking-[0.16em] sm:tracking-[0.2em] uppercase select-none transition-opacity group-hover:opacity-80">
-              KUBERA VASAL
+              GUBERA VASAL
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-brand-accent mb-0.5"></span>
           </a>
 
           {/* CENTER: Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8 lg:gap-11">
-            {navLinks.slice(0, 4).map((link) => (
+          <nav className="hidden md:flex items-center gap-7 lg:gap-10">
+            {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="relative font-sans text-[14px] sm:text-[15px] font-medium tracking-wide uppercase text-brand-muted hover:text-brand-dark transition-colors py-1 group"
+                className="relative font-sans text-[13px] sm:text-[14px] font-medium tracking-wide uppercase text-brand-muted hover:text-brand-dark transition-colors py-1 group"
               >
                 <span>{link.name}</span>
                 <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-brand-dark transition-all duration-300 group-hover:w-full"></span>
@@ -134,7 +134,7 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
                 className="flex items-center gap-1.5"
               >
                 <span className="font-display font-extrabold text-xl text-brand-dark tracking-[0.16em] uppercase">
-                  KUBERA VASAL
+                  GUBERA VASAL
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-accent mb-0.5"></span>
               </a>
@@ -149,7 +149,7 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
             </div>
 
             {/* Middle: Editorial Large Navigation Links */}
-            <nav className="flex flex-col py-8 space-y-6">
+            <nav className="flex flex-col py-8 space-y-5">
               <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-brand-accent block">
                 Menu Directory
               </span>
@@ -177,7 +177,7 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
                 }}
                 className="group flex items-center justify-between text-2xl font-display font-medium text-brand-dark hover:text-black transition-colors pt-2 border-t border-brand-divider/50"
               >
-                <span className="tracking-tight">Contact Us</span>
+                <span className="tracking-tight">Book Free Site Visit</span>
                 <span className="text-xs font-mono text-brand-light-muted group-hover:text-brand-dark transition-colors">
                   06
                 </span>
@@ -187,8 +187,8 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
             {/* Bottom: Direct Contact Details & Prominent Black Contact Button */}
             <div className="pt-6 border-t border-brand-divider space-y-4">
               <div className="text-xs text-brand-muted space-y-1">
-                <span className="text-[10px] uppercase tracking-wider text-brand-light-muted block">Advisory Desk</span>
-                <p className="font-medium text-brand-dark">+91 98422 12345 • contact@kuberavasal.in</p>
+                <span className="text-[10px] uppercase tracking-wider text-brand-light-muted block">Direct Desk</span>
+                <p className="font-medium text-brand-dark">+91 98422 12345 • contact@guberavasal.in</p>
               </div>
 
               <button
@@ -198,7 +198,7 @@ const Header = ({ onContactClick, activeSection = 'home' }) => {
                 }}
                 className="btn-architectural w-full h-12 text-xs uppercase tracking-widest font-semibold flex items-center justify-center gap-2"
               >
-                <span>Contact Us</span>
+                <span>Book Site Visit (Cab Pickup)</span>
                 <ArrowUpRight size={16} />
               </button>
             </div>

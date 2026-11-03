@@ -19,8 +19,8 @@ const servicesList = [
   },
   {
     number: '04',
-    title: 'Up to 80% Bank Loan Assistance',
-    description: 'Direct tie-ups with SBI, HDFC, LIC HFL, and leading nationalized banks for fast, hassle-free plot loan approvals.',
+    title: '80% to 90% Bank Loan Assistance',
+    description: 'Direct tie-ups with all major nationalized and leading private banks for fast, hassle-free plot loan approvals with minimal documentation.',
   },
 ];
 

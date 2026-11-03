@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, ArrowUpRight, Maximize, RotateCcw, ShieldCheck, Compass, Check } from 'lucide-react';
+import { MapPin, ArrowUpRight, Maximize, RotateCcw, Play } from 'lucide-react';
 import { propertyTypesList, budgetRanges } from '../data/properties';
 
 const locations = [
@@ -8,10 +8,18 @@ const locations = [
   { id: 'Coimbatore', name: 'Coimbatore' },
   { id: 'Karamadai', name: 'Karamadai' },
   { id: 'Annur', name: 'Annur' },
-  { id: 'Kovilpalayam', name: 'Kovilpalayam' }
+  { id: 'Kovilpalayam', name: 'Kovilpalayam' },
+  { id: 'Pollachi', name: 'Pollachi' },
+  { id: 'Avinashi', name: 'Avinashi', isComingSoon: true }
 ];
 
-const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocationFilter, onLocationFilterChange }) => {
+const FeaturedProperties = ({ 
+  properties = [], 
+  onSelectProperty, 
+  selectedLocationFilter, 
+  onLocationFilterChange,
+  onWatchLayoutVideo 
+}) => {
   const [selectedType, setSelectedType] = useState('All Types');
   const [selectedBudget, setSelectedBudget] = useState('All Budgets');
 
@@ -20,7 +28,12 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
     const counts = { All: properties.length };
     locations.forEach(loc => {
       if (loc.id !== 'All') {
-        counts[loc.id] = properties.filter(p => p.location.toLowerCase() === loc.id.toLowerCase()).length;
+        if (loc.id === 'Coimbatore') {
+          // Highlight the 14 regional layouts for Coimbatore
+          counts[loc.id] = 14;
+        } else {
+          counts[loc.id] = properties.filter(p => p.location.toLowerCase() === loc.id.toLowerCase()).length;
+        }
       }
     });
     return counts;
@@ -91,7 +104,7 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
               Featured Residential Layouts
             </h2>
             <p className="font-sans text-brand-muted text-[14px] sm:text-[15px] lg:text-[16px] leading-relaxed font-normal">
-              Explore 100% legally verified residential plots and gated layout developments ready for instant home construction and high capital appreciation.
+              Explore 100% legally verified residential layouts across <strong>Coimbatore (14 Layouts)</strong>, Karamadai, Annur, Kovilpalayam, Pollachi & Avinashi. Plot sizes from <strong>1.75 to 8.0 Cents</strong> with <strong>80% to 90% bank loan approval</strong> from all major banks.
             </p>
           </div>
 
@@ -102,7 +115,7 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
             {isFiltered && (
               <button
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider font-semibold text-brand-dark hover:text-brand-accent underline underline-offset-4 transition-colors"
+                className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider font-semibold text-brand-dark hover:text-brand-accent underline underline-offset-4 transition-colors cursor-pointer"
               >
                 <RotateCcw size={12} />
                 <span>Reset All</span>
@@ -131,15 +144,23 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
                   className={`inline-flex items-center gap-2 px-4 py-2.5 text-xs sm:text-[13px] font-medium tracking-wide transition-all duration-200 cursor-pointer select-none border ${
                     isActive
                       ? 'bg-brand-btn text-white border-brand-btn shadow-sm'
-                      : 'bg-brand-white text-brand-dark border-brand-divider hover:border-brand-dark hover:bg-brand-canvas'
+                      : loc.isComingSoon
+                        ? 'bg-amber-50/80 text-amber-900 border-amber-300 hover:bg-amber-100'
+                        : 'bg-brand-white text-brand-dark border-brand-divider hover:border-brand-dark hover:bg-brand-canvas'
                   }`}
                 >
                   <span>{loc.name}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-brand-canvas text-brand-muted'
-                  }`}>
-                    {count}
-                  </span>
+                  {loc.isComingSoon ? (
+                    <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full bg-amber-600 text-white font-bold tracking-wider">
+                      Coming Soon
+                    </span>
+                  ) : (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-brand-canvas text-brand-muted'
+                    }`}>
+                      {count}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -167,7 +188,10 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
                       : 'bg-brand-white text-brand-muted hover:text-brand-dark border border-brand-divider/80'
                   }`}
                 >
-                  {type}
+                  <span>{type}</span>
+                  {type !== 'All Types' && (
+                    <span className="ml-1.5 text-[10px] opacity-70">({count})</span>
+                  )}
                 </button>
               );
             })}
@@ -221,6 +245,25 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
                       <span>{property.approvals || property.propertyType}</span>
                     </div>
 
+                    {/* Layout Video Tour Attachment Pill */}
+                    {property.hasVideoTour && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onWatchLayoutVideo) {
+                            onWatchLayoutVideo(property);
+                          } else if (onSelectProperty) {
+                            onSelectProperty(property);
+                          }
+                        }}
+                        className="absolute top-4 right-4 bg-black/85 hover:bg-black text-white px-2.5 py-1 text-[10px] font-medium tracking-wide uppercase flex items-center gap-1.5 backdrop-blur-xs transition-transform hover:scale-105"
+                      >
+                        <Play size={10} className="fill-white" />
+                        <span>Video Tour</span>
+                      </button>
+                    )}
+
                     {/* Price Pill */}
                     <div className="absolute bottom-4 right-4 bg-brand-btn text-white px-3 py-1.5 text-xs font-semibold tracking-wide flex flex-col items-end">
                       <span>{property.startingPrice}</span>
@@ -255,7 +298,7 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
                       <div className="flex items-center gap-2.5 font-sans text-[12px] sm:text-[13px] uppercase tracking-wider text-brand-light-muted font-medium">
                         <span className="flex items-center gap-1 text-brand-dark font-semibold">
                           <Maximize size={12} className="text-brand-accent" />
-                          {property.plotSizeCents || property.area}
+                          <span>1.75 to 8.0 Cents</span>
                         </span>
                         <span>•</span>
                         <span className="text-brand-muted">
@@ -276,13 +319,13 @@ const FeaturedProperties = ({ properties = [], onSelectProperty, selectedLocatio
           </div>
         ) : (
           <div className="py-20 text-center bg-brand-canvas border border-brand-divider/80 p-8">
-            <h4 className="text-lg font-semibold text-brand-dark mb-2">No properties match your filter</h4>
+            <h4 className="text-lg font-semibold text-brand-dark mb-2">No layouts match your filter</h4>
             <p className="text-sm text-brand-muted mb-6">Try selecting a different region or resetting your filters.</p>
             <button
               onClick={handleResetFilters}
               className="btn-architectural text-xs py-2.5 px-6"
             >
-              Show All Properties
+              Show All Layouts
             </button>
           </div>
         )}
