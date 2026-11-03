@@ -15,6 +15,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
 
   const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState('');
+  const [submittedCode, setSubmittedCode] = useState('');
   const isSubmittingRef = useRef(false);
 
   const handleChange = (e) => {
@@ -45,7 +46,10 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
     setErrorMessage('');
 
     try {
-      await submitEnquiry(formData);
+      const response = await submitEnquiry(formData);
+      if (response?.enquiryCode) {
+        setSubmittedCode(response.enquiryCode);
+      }
       setStatus('success');
       // Reset form on success
       setFormData({
@@ -121,6 +125,11 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
                   <CheckCircle2 size={32} />
                 </div>
                 <h3 className="text-2xl font-display font-semibold text-brand-dark mb-2">Enquiry Received</h3>
+                {submittedCode && (
+                  <span className="inline-block px-3 py-1 bg-brand-canvas border border-brand-divider text-brand-dark font-mono text-xs font-semibold rounded mb-3">
+                    Ref ID: {submittedCode}
+                  </span>
+                )}
                 <p className="text-sm text-brand-muted max-w-md leading-relaxed mb-8">
                   Thank you! Our Gubera Vasal plot consultant will review your preferences and contact you within 24 hours to schedule your free site visit with complimentary cab pickup.
                 </p>

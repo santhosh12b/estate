@@ -10,13 +10,14 @@ A modern, high-performance web platform for **Gubera Vasal**, a premier real est
 - **Legal Explanation Video**: Dedicated 100% legal scrutiny video guide explaining 30-year parent document searches, DTCP & RERA layout approvals, Nil Encumbrance Certificates (EC), and spot Patta transfer.
 - **Layout Video Tour Attachment**: Drone walkthrough and layout tour on each layout card and layout detail modal.
 - **Buyer Facilities**: **80% to 90% bank loan approval** from all major nationalized and private banks, 100% legal verification, immediate Patta transfer, and complimentary cab pick-up & drop for site visits.
-- **Fast Lead Capture Modal**: Dedicated contact and site visit booking popup integrated directly with Google Apps Script & Google Sheets backend.
+- **Fast Lead Capture Modal**: Dedicated contact and site visit booking popup connected to a high-speed **Node.js & Neon PostgreSQL** serverless backend with unique Reference ID generation.
 - **Mobile Responsive Design**: 64px mobile header, full-screen overlay navigation, and sticky action bar (WhatsApp, Call, Book Site Visit).
 
 ## Tech Stack
 
 - **Frontend**: React 19, Vite, Tailwind CSS
+- **Backend**: Node.js Serverless Functions (`/api/enquiries`, `/api/health`, `/api/setup-db`) on Vercel
+- **Database**: [Neon Tech](https://neon.tech) Serverless PostgreSQL (`@neondatabase/serverless`)
 - **Typography**: Manrope (Headings & Display) + Inter (Body & UI)
 - **Icons**: Lucide React
 - **Animations**: Framer Motion
-- **Backend**: Google Apps Script Web App (Serverless Google Sheets CRM)

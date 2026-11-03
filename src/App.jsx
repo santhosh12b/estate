@@ -23,7 +23,7 @@ function App() {
   const [videoModalData, setVideoModalData] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
-  // Load properties dynamically from Render Backend / Supabase (with fallback)
+  // Load properties dynamically (from database or curated dataset)
   useEffect(() => {
     async function loadProperties() {
       try {
@@ -32,7 +32,7 @@ function App() {
           setProperties(result.data);
         }
       } catch (err) {
-        console.warn("Failed loading properties from backend, using defaults:", err);
+        console.warn("Failed loading properties from Google Sheets, using defaults:", err);
       }
     }
     loadProperties();
