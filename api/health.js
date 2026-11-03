@@ -8,8 +8,9 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   const databaseConfigured = Boolean(
-    process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('user:password')
+    databaseUrl && !databaseUrl.includes('user:password')
   );
 
   let dbStatus = 'not_configured';

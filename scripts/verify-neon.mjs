@@ -16,3 +16,4 @@ try {
   console.error('❌ Neon Verification Error:', err.message);
   process.exit(1);
 }
+
