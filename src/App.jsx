@@ -11,10 +11,15 @@ import PropertyModal from './components/PropertyModal';
 import ContactModal from './components/ContactModal';
 import MobileStickyBar from './components/MobileStickyBar';
 import VideoModal from './components/VideoModal';
+import AdminPortal from './components/AdminPortal';
 import { fetchProjects } from './services/api';
 import { defaultProperties } from './data/properties';
 
 function App() {
+  const [isAdminView, setIsAdminView] = useState(() => {
+    return window.location.pathname === '/admin' || window.location.hash === '#admin';
+  });
+
   const [properties, setProperties] = useState(defaultProperties);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [prefilledProperty, setPrefilledProperty] = useState(null);
@@ -22,6 +27,24 @@ function App() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [videoModalData, setVideoModalData] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  // Sync routing on history navigation
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setIsAdminView(window.location.pathname === '/admin' || window.location.hash === '#admin');
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
+  }, []);
+
+  const handleBackToSite = () => {
+    window.history.pushState({}, '', '/');
+    setIsAdminView(false);
+  };
 
   // Load properties dynamically (from database or curated dataset)
   useEffect(() => {
@@ -81,6 +104,10 @@ function App() {
     });
     setIsVideoModalOpen(true);
   };
+
+  if (isAdminView) {
+    return <AdminPortal onBackToSite={handleBackToSite} />;
+  }
 
   return (
     <div className="min-h-screen w-full bg-brand-white flex flex-col pb-16 md:pb-0">

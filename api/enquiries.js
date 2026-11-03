@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PATCH,PUT,DELETE');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-admin-key'
@@ -147,6 +147,76 @@ export default async function handler(req, res) {
       message: 'Enquiry captured successfully! (Neon DATABASE_URL pending configuration)',
       simulated: true
     });
+  }
+
+  // -------------------------------------------------------------
+  // 3. PATCH/PUT: Update Enquiry Status
+  // -------------------------------------------------------------
+  if (req.method === 'PATCH' || req.method === 'PUT') {
+    const adminKey = process.env.ADMIN_API_KEY;
+    const providedKey = req.headers['x-admin-key'] || req.query.key;
+
+    if (adminKey && providedKey !== adminKey) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized: Invalid or missing admin key.'
+      });
+    }
+
+    const { id, status } = req.body || {};
+    if (!id) {
+      return res.status(400).json({ success: false, error: 'Missing enquiry id.' });
+    }
+
+    try {
+      const sql = getSql();
+      const updated = await sql`
+        UPDATE enquiries 
+        SET 
+          status = COALESCE(${status || null}, status),
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING id, enquiry_code, status, updated_at;
+      `;
+      return res.status(200).json({
+        success: true,
+        message: 'Status updated successfully',
+        data: updated[0]
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 4. DELETE: Remove Lead / Spam
+  // -------------------------------------------------------------
+  if (req.method === 'DELETE') {
+    const adminKey = process.env.ADMIN_API_KEY;
+    const providedKey = req.headers['x-admin-key'] || req.query.key;
+
+    if (adminKey && providedKey !== adminKey) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized: Invalid or missing admin key.'
+      });
+    }
+
+    const id = req.query?.id || req.body?.id;
+    if (!id) {
+      return res.status(400).json({ success: false, error: 'Missing enquiry id.' });
+    }
+
+    try {
+      const sql = getSql();
+      await sql`DELETE FROM enquiries WHERE id = ${id};`;
+      return res.status(200).json({
+        success: true,
+        message: 'Enquiry deleted successfully'
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
   }
 
   return res.status(405).json({

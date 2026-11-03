@@ -76,3 +76,4 @@ try {
   console.error('❌ Database Initialization Error:', err.message);
   process.exit(1);
 }
+

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, ArrowUpRight, ShieldCheck, FileText } from 'lucide-react';
+import { MessageCircle, ArrowUpRight, ShieldCheck, FileText, Lock } from 'lucide-react';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -125,6 +125,18 @@ const Footer = ({ onContactClick }) => {
                 <FileText size={13} />
                 <span>Terms & Conditions</span>
               </button>
+              <a
+                href="/admin"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.history.pushState({}, '', '/admin');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
+                className="hover:text-brand-dark transition-colors inline-flex items-center gap-1 cursor-pointer text-brand-light-muted hover:text-brand-dark"
+              >
+                <Lock size={12} />
+                <span>Admin Console</span>
+              </a>
             </div>
           </div>
 
