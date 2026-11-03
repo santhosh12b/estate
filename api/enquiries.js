@@ -22,6 +22,9 @@ export default async function handler(req, res) {
 
   const databaseUrl = process.env.DATABASE_URL || 
     process.env.POSTGRES_URL || 
+    process.env.POSTGRES_PRISMA_URL || 
+    process.env.POSTGRES_URL_NON_POOLING || 
+    process.env.NEON_DATABASE_URL || 
     process.env.NEON_URL || 
     process.env.STORAGE_URL;
   const isDbConfigured = Boolean(

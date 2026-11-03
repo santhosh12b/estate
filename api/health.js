@@ -10,6 +10,9 @@ export default async function handler(req, res) {
 
   const databaseUrl = process.env.DATABASE_URL || 
     process.env.POSTGRES_URL || 
+    process.env.POSTGRES_PRISMA_URL || 
+    process.env.POSTGRES_URL_NON_POOLING || 
+    process.env.NEON_DATABASE_URL || 
     process.env.NEON_URL || 
     process.env.STORAGE_URL;
   const databaseConfigured = Boolean(
@@ -31,6 +34,11 @@ export default async function handler(req, res) {
     }
   }
 
+  // Safe list of relevant database environment variable keys present in environment
+  const detectedKeys = Object.keys(process.env).filter(k => 
+    k.includes('DATABASE') || k.includes('POSTGRES') || k.includes('NEON') || k.includes('STORAGE')
+  );
+
   return res.status(200).json({
     status: 'ok',
     service: 'Gubera Vasal API',
@@ -38,6 +46,7 @@ export default async function handler(req, res) {
       provider: 'Neon PostgreSQL (Serverless)',
       status: dbStatus,
       latency: latencyMs !== null ? `${latencyMs}ms` : undefined,
+      detectedKeys: detectedKeys.length > 0 ? detectedKeys : 'None found in environment'
     },
     timestamp: new Date().toISOString()
   });
