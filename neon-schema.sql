@@ -56,3 +56,4 @@ CREATE TRIGGER trigger_enquiries_updated_at
 BEFORE UPDATE ON enquiries
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
+

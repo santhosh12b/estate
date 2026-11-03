@@ -86,3 +86,4 @@ https://your-vercel-domain.vercel.app/api/setup-db?key=gubera_vasal_secret_admin
   GET https://your-vercel-domain.vercel.app/api/enquiries?key=your_secret_admin_key
   ```
   or pass header: `x-admin-key: your_secret_admin_key`. Returns the latest 100 leads formatted in JSON.
+

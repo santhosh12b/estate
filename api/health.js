@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { getSql } from './_db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   if (databaseConfigured) {
     try {
       const start = Date.now();
-      const sql = neon(process.env.DATABASE_URL);
+      const sql = getSql();
       await sql`SELECT 1 as ping`;
       latencyMs = Date.now() - start;
       dbStatus = 'connected';
@@ -38,3 +38,4 @@ export default async function handler(req, res) {
     timestamp: new Date().toISOString()
   });
 }
+

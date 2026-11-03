@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { getSql } from './_db.js';
 
 function generateEnquiryCode() {
   const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     }
 
     try {
-      const sql = neon(databaseUrl);
+      const sql = getSql();
       const rows = await sql`
         SELECT 
           id, enquiry_code, full_name, phone_number, email,
@@ -110,7 +110,7 @@ export default async function handler(req, res) {
     // If Neon database is configured, insert directly
     if (isDbConfigured) {
       try {
-        const sql = neon(databaseUrl);
+        const sql = getSql();
         const rows = await sql`
           INSERT INTO enquiries (
             enquiry_code, full_name, phone_number, email,
@@ -154,3 +154,4 @@ export default async function handler(req, res) {
     error: `Method ${req.method} Not Allowed`
   });
 }
+

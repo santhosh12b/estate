@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { getSql } from './_db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const sql = neon(databaseUrl);
+    const sql = getSql();
 
     // 1. Create enquiries table
     await sql`
@@ -63,3 +63,4 @@ export default async function handler(req, res) {
     });
   }
 }
+
