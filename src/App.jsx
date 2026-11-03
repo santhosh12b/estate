@@ -11,7 +11,7 @@ import PropertyModal from './components/PropertyModal';
 import ContactModal from './components/ContactModal';
 import MobileStickyBar from './components/MobileStickyBar';
 import VideoModal from './components/VideoModal';
-import { fetchProjectsFromSheets } from './services/googleSheets';
+import { fetchProjects } from './services/api';
 import { defaultProperties } from './data/properties';
 
 function App() {
@@ -23,16 +23,16 @@ function App() {
   const [videoModalData, setVideoModalData] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
-  // Load properties dynamically from Google Sheets if configured
+  // Load properties dynamically from Render Backend / Supabase (with fallback)
   useEffect(() => {
     async function loadProperties() {
       try {
-        const result = await fetchProjectsFromSheets();
+        const result = await fetchProjects();
         if (result && result.success && Array.isArray(result.data)) {
           setProperties(result.data);
         }
       } catch (err) {
-        console.warn("Failed loading properties from Google Sheets, using defaults:", err);
+        console.warn("Failed loading properties from backend, using defaults:", err);
       }
     }
     loadProperties();

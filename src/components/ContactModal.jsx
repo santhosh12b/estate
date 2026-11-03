@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, AlertCircle, Loader2, ArrowRight, MapPin, ShieldCheck } from 'lucide-react';
-import { submitEnquiryToSheets } from '../services/googleSheets';
+import { submitEnquiry } from '../services/api';
 
 const getInitialFormData = (prop) => ({
   fullName: '',
@@ -75,7 +75,7 @@ const ContactModal = ({ isOpen, onClose, prefilledProperty = null }) => {
     setErrorMessage('');
 
     try {
-      await submitEnquiryToSheets(formData);
+      await submitEnquiry(formData);
       setStatus('success');
       // Reset form
       setFormData(getInitialFormData(null));

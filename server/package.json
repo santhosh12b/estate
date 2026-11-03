@@ -1,0 +1,31 @@
+{
+  "name": "gubera-vasal-backend",
+  "version": "1.0.0",
+  "description": "Production Express API & Supabase integration for Gubera Vasal Real Estate Platform",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "keywords": [
+    "real-estate",
+    "express",
+    "supabase",
+    "render",
+    "api",
+    "gubera-vasal"
+  ],
+  "author": "Gubera Vasal",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0"
+  }
+}

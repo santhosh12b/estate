@@ -160,3 +160,4 @@ const VideoModal = ({ isOpen, onClose, videoData }) => {
 };
 
 export default VideoModal;
+

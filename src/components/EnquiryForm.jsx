@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
-import { submitEnquiryToSheets } from '../services/googleSheets';
+import { submitEnquiry } from '../services/api';
 
 const EnquiryForm = ({ prefilledProperty = null }) => {
   const [formData, setFormData] = useState({
@@ -45,7 +45,7 @@ const EnquiryForm = ({ prefilledProperty = null }) => {
     setErrorMessage('');
 
     try {
-      await submitEnquiryToSheets(formData);
+      await submitEnquiry(formData);
       setStatus('success');
       // Reset form on success
       setFormData({
