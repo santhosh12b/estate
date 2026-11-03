@@ -1,5 +1,28 @@
 import { getSql } from './_db.js';
 
+async function ensureTable(sql) {
+  await sql`
+    CREATE TABLE IF NOT EXISTS enquiries (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      enquiry_code VARCHAR(50) UNIQUE NOT NULL,
+      full_name VARCHAR(150) NOT NULL,
+      phone_number VARCHAR(25) NOT NULL,
+      email VARCHAR(150),
+      preferred_location VARCHAR(100) DEFAULT 'Coimbatore',
+      property_type VARCHAR(100) DEFAULT 'Gated Community Plots',
+      budget VARCHAR(100) DEFAULT '₹20 Lakhs – ₹35 Lakhs',
+      message TEXT,
+      status VARCHAR(50) DEFAULT 'New Lead',
+      source VARCHAR(50) DEFAULT 'Website Form',
+      ip_address VARCHAR(64),
+      user_agent TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+      updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+    );
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_enquiries_created_at ON enquiries (created_at DESC);`;
+}
+
 function generateEnquiryCode() {
   const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
   const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -22,9 +45,6 @@ export default async function handler(req, res) {
 
   const databaseUrl = process.env.DATABASE_URL || 
     process.env.POSTGRES_URL || 
-    process.env.POSTGRES_PRISMA_URL || 
-    process.env.POSTGRES_URL_NON_POOLING || 
-    process.env.NEON_DATABASE_URL || 
     process.env.NEON_URL || 
     process.env.STORAGE_URL;
   const isDbConfigured = Boolean(
@@ -56,15 +76,33 @@ export default async function handler(req, res) {
 
     try {
       const sql = getSql();
-      const rows = await sql`
-        SELECT 
-          id, enquiry_code, full_name, phone_number, email,
-          preferred_location, property_type, budget, message,
-          status, source, created_at
-        FROM enquiries
-        ORDER BY created_at DESC
-        LIMIT 100;
-      `;
+      let rows;
+      try {
+        rows = await sql`
+          SELECT 
+            id, enquiry_code, full_name, phone_number, email,
+            preferred_location, property_type, budget, message,
+            status, source, created_at
+          FROM enquiries
+          ORDER BY created_at DESC
+          LIMIT 100;
+        `;
+      } catch (queryErr) {
+        if (queryErr.message?.includes('does not exist') || queryErr.code === '42P01') {
+          await ensureTable(sql);
+          rows = await sql`
+            SELECT 
+              id, enquiry_code, full_name, phone_number, email,
+              preferred_location, property_type, budget, message,
+              status, source, created_at
+            FROM enquiries
+            ORDER BY created_at DESC
+            LIMIT 100;
+          `;
+        } else {
+          throw queryErr;
+        }
+      }
       return res.status(200).json({
         success: true,
         count: rows.length,
@@ -117,18 +155,39 @@ export default async function handler(req, res) {
     if (isDbConfigured) {
       try {
         const sql = getSql();
-        const rows = await sql`
-          INSERT INTO enquiries (
-            enquiry_code, full_name, phone_number, email,
-            preferred_location, property_type, budget, message,
-            status, source, ip_address, user_agent
-          ) VALUES (
-            ${enquiryCode}, ${fullName}, ${phoneNumber}, ${email},
-            ${preferredLocation}, ${propertyType}, ${budget}, ${message},
-            'New Lead', ${source}, ${ipAddress}, ${userAgent}
-          )
-          RETURNING id, enquiry_code, created_at;
-        `;
+        let rows;
+        try {
+          rows = await sql`
+            INSERT INTO enquiries (
+              enquiry_code, full_name, phone_number, email,
+              preferred_location, property_type, budget, message,
+              status, source, ip_address, user_agent
+            ) VALUES (
+              ${enquiryCode}, ${fullName}, ${phoneNumber}, ${email},
+              ${preferredLocation}, ${propertyType}, ${budget}, ${message},
+              'New Lead', ${source}, ${ipAddress}, ${userAgent}
+            )
+            RETURNING id, enquiry_code, created_at;
+          `;
+        } catch (insertErr) {
+          if (insertErr.message?.includes('does not exist') || insertErr.code === '42P01') {
+            await ensureTable(sql);
+            rows = await sql`
+              INSERT INTO enquiries (
+                enquiry_code, full_name, phone_number, email,
+                preferred_location, property_type, budget, message,
+                status, source, ip_address, user_agent
+              ) VALUES (
+                ${enquiryCode}, ${fullName}, ${phoneNumber}, ${email},
+                ${preferredLocation}, ${propertyType}, ${budget}, ${message},
+                'New Lead', ${source}, ${ipAddress}, ${userAgent}
+              )
+              RETURNING id, enquiry_code, created_at;
+            `;
+          } else {
+            throw insertErr;
+          }
+        }
 
         return res.status(201).json({
           success: true,
