@@ -100,13 +100,22 @@ function App() {
       type: 'layout',
       title: property.videoTitle || `${property.name} — Drone Walkthrough`,
       poster: property.imageUrl,
-      description: `Aerial drone walkthrough of ${property.name} in ${property.location}. Featuring 33ft/30ft asphalt tar roads, sweet water facilities, avenue trees, and 80%-90% bank loan approved plots.`
+      videoUrl: property.videoUrl || '',
+      description: property.description || `Aerial drone walkthrough of ${property.name} in ${property.location}. Featuring 33ft/30ft asphalt tar roads, sweet water facilities, avenue trees, and 80%-90% bank loan approved plots.`
     });
     setIsVideoModalOpen(true);
   };
 
   if (isAdminView) {
-    return <AdminPortal onBackToSite={handleBackToSite} />;
+    return (
+      <AdminPortal 
+        onBackToSite={handleBackToSite} 
+        onRefreshPlots={async () => {
+          const res = await fetchProjects();
+          if (res?.data) setProperties(res.data);
+        }}
+      />
+    );
   }
 
   return (

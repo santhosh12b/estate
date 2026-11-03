@@ -61,13 +61,70 @@ export async function submitEnquiry(enquiry) {
 }
 
 /**
- * Fetch project listings (from database or local catalog)
+ * Fetch project listings (from Neon database with curated fallback)
  */
 export async function fetchProjects() {
+  try {
+    const res = await fetch('/api/projects');
+    if (res.ok) {
+      const result = await res.json();
+      if (result && Array.isArray(result.data) && result.data.length > 0) {
+        return {
+          success: true,
+          data: result.data,
+          source: 'neon_database'
+        };
+      }
+    }
+  } catch (err) {
+    console.warn('Could not fetch projects from /api/projects, using fallback:', err.message);
+  }
+
   return {
     success: true,
     data: defaultProperties,
     source: 'curated'
   };
+}
+
+/**
+ * Save (create or update) a layout/plot in Neon database
+ */
+export async function saveProject(projectData, adminKey) {
+  const isEditing = Boolean(projectData.id);
+  const method = isEditing ? 'PATCH' : 'POST';
+
+  const res = await fetch('/api/projects', {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-key': adminKey
+    },
+    body: JSON.stringify(projectData)
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Failed to save layout');
+  }
+  return data;
+}
+
+/**
+ * Delete a layout/plot from Neon database
+ */
+export async function deleteProject(id, adminKey) {
+  const res = await fetch(`/api/projects?id=${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: {
+      'x-admin-key': adminKey
+    }
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Failed to delete layout');
+  }
+  return data;
 }
 

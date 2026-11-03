@@ -55,9 +55,38 @@ export default async function handler(req, res) {
       CREATE INDEX IF NOT EXISTS idx_enquiries_created_at ON enquiries (created_at DESC);
     `;
 
+    // 3. Create projects table
+    await sql`
+      CREATE TABLE IF NOT EXISTS projects (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        location TEXT NOT NULL,
+        sub_location TEXT,
+        property_type TEXT DEFAULT 'Gated Community Plots' NOT NULL,
+        description TEXT,
+        starting_price TEXT NOT NULL,
+        price_per_cent TEXT,
+        plot_sizes TEXT DEFAULT '1.75 to 8.0 Cents' NOT NULL,
+        sqft_range TEXT DEFAULT '762 – 3,485 Sq.Ft',
+        loan_eligibility TEXT DEFAULT '80% to 90% Bank Loan Approved by All Major Banks' NOT NULL,
+        image_url TEXT NOT NULL,
+        gallery JSONB DEFAULT '[]'::jsonb,
+        highlights JSONB DEFAULT '[]'::jsonb,
+        status TEXT DEFAULT 'Available',
+        is_featured BOOLEAN DEFAULT true,
+        has_video_tour BOOLEAN DEFAULT true,
+        video_url TEXT,
+        video_title TEXT,
+        display_order INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      );
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_projects_order ON projects (display_order ASC, created_at DESC);`;
+
     return res.status(200).json({
       success: true,
-      message: 'Neon PostgreSQL database tables and indexes initialized successfully for Gubera Vasal!'
+      message: 'Neon PostgreSQL database tables (enquiries, projects) and indexes initialized successfully for Gubera Vasal!'
     });
   } catch (error) {
     return res.status(500).json({

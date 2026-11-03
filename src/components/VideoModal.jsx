@@ -2,6 +2,25 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, ShieldCheck, CheckCircle2, Film } from 'lucide-react';
 
+function getEmbedUrl(rawUrl) {
+  if (!rawUrl) return null;
+  const url = rawUrl.trim();
+  // YouTube regex matching youtu.be/ID or youtube.com/watch?v=ID
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  if (ytMatch) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
+  }
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+  }
+  if (url.includes('/embed/')) {
+    return url;
+  }
+  return null;
+}
+
 const VideoModal = ({ isOpen, onClose, videoData }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -20,6 +39,8 @@ const VideoModal = ({ isOpen, onClose, videoData }) => {
   if (!isOpen || !videoData) return null;
 
   const isLegalVideo = videoData.type === 'legal';
+  const embedUrl = videoData.embedUrl || getEmbedUrl(videoData.videoUrl);
+  const isDirectVideo = Boolean(videoData.videoUrl && (videoData.videoUrl.endsWith('.mp4') || videoData.videoUrl.endsWith('.webm')));
 
   return (
     <AnimatePresence>
@@ -63,14 +84,23 @@ const VideoModal = ({ isOpen, onClose, videoData }) => {
 
           {/* Video Player Container (16:9 Aspect Ratio) */}
           <div className="relative aspect-[16/9] w-full bg-black overflow-hidden flex items-center justify-center group">
-            {videoData.embedUrl ? (
+            {embedUrl ? (
               <iframe
-                src={videoData.embedUrl}
+                src={embedUrl}
                 title={videoData.title}
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
+            ) : isDirectVideo ? (
+              <video
+                src={videoData.videoUrl}
+                controls
+                autoPlay
+                className="w-full h-full object-cover"
+              >
+                Your browser does not support HTML5 video.
+              </video>
             ) : (
               <div className="relative w-full h-full flex flex-col items-center justify-center text-center p-6 bg-gradient-to-br from-zinc-900 via-neutral-900 to-black">
                 {videoData.poster && (
