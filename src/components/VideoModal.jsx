@@ -40,7 +40,14 @@ const VideoModal = ({ isOpen, onClose, videoData }) => {
 
   const isLegalVideo = videoData.type === 'legal';
   const embedUrl = videoData.embedUrl || getEmbedUrl(videoData.videoUrl);
-  const isDirectVideo = Boolean(videoData.videoUrl && (videoData.videoUrl.endsWith('.mp4') || videoData.videoUrl.endsWith('.webm')));
+  const isDirectVideo = Boolean(
+    videoData.videoUrl && (
+      videoData.videoUrl.endsWith('.mp4') || 
+      videoData.videoUrl.endsWith('.webm') ||
+      videoData.videoUrl.startsWith('data:video/') ||
+      videoData.videoUrl.startsWith('blob:')
+    )
+  );
 
   return (
     <AnimatePresence>

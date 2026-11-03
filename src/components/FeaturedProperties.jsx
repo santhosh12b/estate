@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, ArrowUpRight, Maximize, RotateCcw, Play } from 'lucide-react';
 import { propertyTypesList, budgetRanges } from '../data/properties';
 
-const locations = [
+const DEFAULT_LOCATIONS = [
   { id: 'All', name: 'All Regions' },
   { id: 'Coimbatore', name: 'Coimbatore' },
   { id: 'Karamadai', name: 'Karamadai' },
@@ -23,21 +23,34 @@ const FeaturedProperties = ({
   const [selectedType, setSelectedType] = useState('All Types');
   const [selectedBudget, setSelectedBudget] = useState('All Budgets');
 
+  // Dynamic list of locations: combines default list with any newly added custom locations from database
+  const allLocations = useMemo(() => {
+    const known = new Set(DEFAULT_LOCATIONS.map(l => l.id.toLowerCase()));
+    const custom = [];
+    properties.forEach(p => {
+      if (p.location && !known.has(p.location.trim().toLowerCase())) {
+        known.add(p.location.trim().toLowerCase());
+        custom.push({ id: p.location.trim(), name: p.location.trim() });
+      }
+    });
+    return [...DEFAULT_LOCATIONS, ...custom];
+  }, [properties]);
+
   // Compute counts for each location dynamically
   const locationCounts = useMemo(() => {
     const counts = { All: properties.length };
-    locations.forEach(loc => {
+    allLocations.forEach(loc => {
       if (loc.id !== 'All') {
         if (loc.id === 'Coimbatore') {
           // Highlight the 14 regional layouts for Coimbatore
-          counts[loc.id] = 14;
+          counts[loc.id] = Math.max(14, properties.filter(p => p.location?.toLowerCase() === 'coimbatore').length);
         } else {
-          counts[loc.id] = properties.filter(p => p.location.toLowerCase() === loc.id.toLowerCase()).length;
+          counts[loc.id] = properties.filter(p => p.location?.toLowerCase() === loc.id.toLowerCase()).length;
         }
       }
     });
     return counts;
-  }, [properties]);
+  }, [properties, allLocations]);
 
   // Compute counts for property types
   const typeCounts = useMemo(() => {
@@ -133,7 +146,7 @@ const FeaturedProperties = ({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-2 -mx-5 px-5 sm:mx-0 sm:px-0 no-scrollbar sm:flex-wrap">
-            {locations.map((loc) => {
+            {allLocations.map((loc) => {
               const count = locationCounts[loc.id] || 0;
               const isActive = (selectedLocationFilter || 'All').toLowerCase() === loc.id.toLowerCase();
 

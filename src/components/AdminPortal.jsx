@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Lock, Search, RefreshCw, Download, Phone, 
   MessageSquare, Trash2, ArrowLeft, AlertCircle, 
@@ -6,9 +6,19 @@ import {
   Play, Film, X, Check, Eye, EyeOff,
   Copy, Sparkles, CheckCircle2,
   ChevronRight, Building2, Users, Compass,
-  Lightbulb, Info, KeyRound
+  Lightbulb, Info, KeyRound, Upload, Image as ImageIcon,
+  Video, FileVideo, CheckCircle
 } from 'lucide-react';
 import { saveProject, deleteProject } from '../services/api';
+
+const DEFAULT_LOCATIONS = [
+  'Coimbatore',
+  'Karamadai',
+  'Annur',
+  'Kovilpalayam',
+  'Pollachi',
+  'Avinashi'
+];
 
 const LEAD_STATUS_OPTIONS = [
   'New Lead',
@@ -109,6 +119,51 @@ function getEmbedUrl(rawUrl) {
   return null;
 }
 
+// Client-side image compressor using HTML5 canvas
+function compressImage(file, maxWidth = 1280, maxHeight = 1280, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve({
+          dataUrl,
+          width,
+          height,
+          originalSize: file.size,
+          compressedSize: Math.round((dataUrl.length * 3) / 4)
+        });
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+}
+
 // Helper to generate export filename
 function getCsvDownloadFileName() {
   const today = new Date().toISOString().slice(0, 10);
@@ -147,6 +202,27 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
   const [isSavingPlot, setIsSavingPlot] = useState(false);
   const [plotActionMessage, setPlotActionMessage] = useState('');
 
+  // Micro-Market Location Custom Creation
+  const [customLocations, setCustomLocations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('gv_custom_locations');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [isCreatingLocation, setIsCreatingLocation] = useState(false);
+  const [newLocationInput, setNewLocationInput] = useState('');
+
+  // Media Upload & Input Mode States
+  const [imageInputMode, setImageInputMode] = useState('upload'); // 'upload' | 'url'
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const [uploadedImageInfo, setUploadedImageInfo] = useState(null);
+
+  const [videoInputMode, setVideoInputMode] = useState('youtube'); // 'youtube' | 'upload'
+  const [isProcessingVideo, setIsProcessingVideo] = useState(false);
+  const [uploadedVideoInfo, setUploadedVideoInfo] = useState(null);
+
   // Video Preview Modal
   const [previewVideoUrl, setPreviewVideoUrl] = useState('');
   const [previewVideoTitle, setPreviewVideoTitle] = useState('');
@@ -160,6 +236,13 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
       setToastMessage('');
     }, 3200);
   };
+
+  // Dynamic list of all available locations (Default + Plots + Custom Created)
+  const allAvailableLocations = useMemo(() => {
+    const fromPlots = plots.map(p => p.location).filter(Boolean);
+    const combined = [...DEFAULT_LOCATIONS, ...fromPlots, ...customLocations];
+    return Array.from(new Set(combined));
+  }, [plots, customLocations]);
 
   // -------------------------------------------------------------
   // Data Fetching
@@ -363,10 +446,120 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
   };
 
   // -------------------------------------------------------------
+  // Location Custom Creation
+  // -------------------------------------------------------------
+  const handleCreateNewLocation = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = newLocationInput.trim();
+    if (!trimmed) return;
+
+    if (!allAvailableLocations.some(l => l.toLowerCase() === trimmed.toLowerCase())) {
+      const updated = [...customLocations, trimmed];
+      setCustomLocations(updated);
+      try {
+        localStorage.setItem('gv_custom_locations', JSON.stringify(updated));
+      } catch {
+        // ignore storage error
+      }
+    }
+    setPlotFormData(prev => ({ ...prev, location: trimmed }));
+    setNewLocationInput('');
+    setIsCreatingLocation(false);
+    triggerToast(`New location "${trimmed}" created & selected!`);
+  };
+
+  // -------------------------------------------------------------
+  // Image File Upload & Canvas Optimization
+  // -------------------------------------------------------------
+  const handleImageFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, WEBP).');
+      return;
+    }
+
+    setIsProcessingImage(true);
+    try {
+      const result = await compressImage(file, 1280, 1280, 0.82);
+      setPlotFormData(prev => ({ ...prev, imageUrl: result.dataUrl }));
+      setUploadedImageInfo({
+        name: file.name,
+        width: result.width,
+        height: result.height,
+        sizeKB: Math.round(result.compressedSize / 1024)
+      });
+      triggerToast(`Image optimized & attached (${Math.round(result.compressedSize / 1024)} KB)`);
+    } catch (err) {
+      alert('Error optimizing image: ' + err.message);
+    } finally {
+      setIsProcessingImage(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // Video File Upload & Validation
+  // -------------------------------------------------------------
+  const handleVideoFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const sizeMB = file.size / (1024 * 1024);
+    setIsProcessingVideo(true);
+
+    if (sizeMB > 4.5) {
+      // Over serverless limit: create blob URL for local preview and give friendly guidance
+      const localUrl = URL.createObjectURL(file);
+      setPlotFormData(prev => ({
+        ...prev,
+        videoUrl: localUrl,
+        videoTitle: prev.videoTitle || `${file.name.replace(/\.[^/.]+$/, "")} Drone Tour`
+      }));
+      setUploadedVideoInfo({
+        name: file.name,
+        sizeMB: sizeMB.toFixed(1),
+        isTooLargeForServerless: true
+      });
+      setIsProcessingVideo(false);
+      triggerToast(`Local video loaded (${sizeMB.toFixed(1)} MB). Note: YouTube recommended for large files.`);
+      return;
+    }
+
+    // Under 4.5MB: Encode as Data URL so it saves directly in Neon database
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target.result;
+      setPlotFormData(prev => ({
+        ...prev,
+        videoUrl: dataUrl,
+        videoTitle: prev.videoTitle || `${file.name.replace(/\.[^/.]+$/, "")} Drone Tour`
+      }));
+      setUploadedVideoInfo({
+        name: file.name,
+        sizeMB: sizeMB.toFixed(1),
+        isTooLargeForServerless: false
+      });
+      setIsProcessingVideo(false);
+      triggerToast(`Video file attached successfully (${sizeMB.toFixed(1)} MB)`);
+    };
+    reader.onerror = () => {
+      setIsProcessingVideo(false);
+      alert('Could not read video file.');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // -------------------------------------------------------------
   // Plots & Video CMS Actions
   // -------------------------------------------------------------
   const handleOpenNewPlotModal = () => {
     setPlotFormData(INITIAL_PLOT_FORM);
+    setUploadedImageInfo(null);
+    setUploadedVideoInfo(null);
+    setIsCreatingLocation(false);
+    setImageInputMode('upload');
+    setVideoInputMode('youtube');
     setPlotActionMessage('');
     setIsPlotModalOpen(true);
   };
@@ -387,6 +580,11 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
       description: plot.description || '',
       loanEligibility: plot.loanEligibility || '80% to 90% Bank Loan Approved by All Major Banks'
     });
+    setUploadedImageInfo(null);
+    setUploadedVideoInfo(null);
+    setIsCreatingLocation(false);
+    setImageInputMode(plot.imageUrl?.startsWith('data:') ? 'upload' : 'url');
+    setVideoInputMode(plot.videoUrl?.includes('youtube') || plot.videoUrl?.includes('youtu.be') ? 'youtube' : 'upload');
     setPlotActionMessage('');
     setIsPlotModalOpen(true);
   };
@@ -472,7 +670,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
   const renderToast = () => {
     if (!toastMessage) return null;
     return (
-      <div className="fixed bottom-6 right-6 z-50 bg-brand-dark text-white px-5 py-3 rounded-none shadow-2xl border-l-4 border-brand-accent flex items-center gap-3 text-xs font-medium animate-bounce-in">
+      <div className="fixed bottom-6 right-6 z-50 bg-brand-dark text-white px-5 py-3 rounded-none shadow-2xl border-l-4 border-brand-accent flex items-center gap-3 text-xs font-medium">
         <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
         <span>{toastMessage}</span>
       </div>
@@ -500,7 +698,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
               Admin & CMS Portal
             </h1>
             <p className="text-xs text-brand-muted mt-2 leading-relaxed">
-              Sign in to manage incoming customer leads and update plot layouts with YouTube video tours.
+              Sign in to manage incoming customer leads, create custom locations, upload photos, and attach video tours.
             </p>
           </div>
 
@@ -581,7 +779,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
               <ArrowLeft size={14} />
               <span>Back to Website</span>
             </button>
-            <span className="font-mono text-[10px] text-brand-light-muted">v3.5 • DTCP & RERA</span>
+            <span className="font-mono text-[10px] text-brand-light-muted">v3.6 • DTCP & RERA</span>
           </div>
         </div>
       </div>
@@ -714,7 +912,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
               <div className="flex items-center gap-2">
                 <Sparkles size={16} className="text-amber-400" />
                 <h3 className="text-sm font-display font-bold uppercase tracking-wider text-amber-200">
-                  Admin Quick Guide — 3 Simple Steps
+                  Admin Quick Guide — Key Capabilities
                 </h3>
               </div>
               <button 
@@ -726,37 +924,48 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
               {/* Card 1 */}
-              <div className="p-4 bg-white/5 border border-white/10 rounded-xs space-y-2">
+              <div className="p-4 bg-white/5 border border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-amber-300 font-bold">
                   <span className="w-5 h-5 rounded-full bg-amber-400 text-stone-900 flex items-center justify-center font-mono text-[11px] font-bold">1</span>
-                  <span>Respond to Leads in 1-Click</span>
+                  <span>Respond via WhatsApp / Call</span>
                 </div>
                 <p className="text-white/70 leading-relaxed text-[11px]">
-                  Click the green <strong>"WhatsApp"</strong> button to immediately open a pre-written WhatsApp chat with the client's name and enquiry code, or click <strong>"Call"</strong> to dial on your mobile.
+                  Click <strong>"WhatsApp"</strong> to open a pre-written message with the buyer's name and enquiry code, or <strong>"Call"</strong> to dial directly.
                 </p>
               </div>
 
               {/* Card 2 */}
-              <div className="p-4 bg-white/5 border border-white/10 rounded-xs space-y-2">
+              <div className="p-4 bg-white/5 border border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-amber-300 font-bold">
                   <span className="w-5 h-5 rounded-full bg-amber-400 text-stone-900 flex items-center justify-center font-mono text-[11px] font-bold">2</span>
-                  <span>Paste Any YouTube Video</span>
+                  <span>Upload Photos Directly</span>
                 </div>
                 <p className="text-white/70 leading-relaxed text-[11px]">
-                  Under <em>"Manage Plots"</em>, click <strong>"+ Add New Layout"</strong> or <strong>Edit</strong>. Paste any YouTube video link from your drone or phone. You can preview it right inside the form before saving!
+                  Choose any photo file from your phone camera or computer. It automatically compresses to a crisp web format for instant website display.
                 </p>
               </div>
 
               {/* Card 3 */}
-              <div className="p-4 bg-white/5 border border-white/10 rounded-xs space-y-2">
+              <div className="p-4 bg-white/5 border border-white/10 space-y-2">
                 <div className="flex items-center gap-2 text-amber-300 font-bold">
                   <span className="w-5 h-5 rounded-full bg-amber-400 text-stone-900 flex items-center justify-center font-mono text-[11px] font-bold">3</span>
-                  <span>Instant Website Synchronization</span>
+                  <span>Video Tours & YouTube</span>
                 </div>
                 <p className="text-white/70 leading-relaxed text-[11px]">
-                  Whenever you update prices, change status to <em>"Fast Selling"</em> or <em>"Ready for Construction"</em>, or add a new layout, the public website updates instantly without needing code changes.
+                  Paste YouTube links for instant player streaming, or upload a video file (.mp4). You can test-play the video right inside the modal!
+                </p>
+              </div>
+
+              {/* Card 4 */}
+              <div className="p-4 bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center gap-2 text-amber-300 font-bold">
+                  <span className="w-5 h-5 rounded-full bg-amber-400 text-stone-900 flex items-center justify-center font-mono text-[11px] font-bold">4</span>
+                  <span>Create Custom Locations</span>
+                </div>
+                <p className="text-white/70 leading-relaxed text-[11px]">
+                  Click <strong>"+ New Location"</strong> in the layout form to add any micro-market (e.g. Sulur, Saravanampatti). It appears on the website instantly!
                 </p>
               </div>
             </div>
@@ -908,7 +1117,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                   );
                 })}
 
-                {/* Location Filter Dropdown */}
+                {/* Location Filter Dropdown (Includes newly created locations) */}
                 {leadLocationsList.length > 2 && (
                   <div className="w-full sm:w-auto flex items-center gap-2 mt-2 sm:mt-0 sm:ml-auto">
                     <span className="text-brand-muted text-[11px] font-bold uppercase tracking-wider">
@@ -1009,7 +1218,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                                 </span>
                                 <button
                                   onClick={() => handleCopyText(lead.enquiry_code, lead.id)}
-                                  className="text-brand-muted hover:text-brand-dark p-0.5"
+                                  className="text-brand-muted hover:text-brand-dark p-0.5 cursor-pointer"
                                   title="Copy reference code"
                                 >
                                   {copiedCode === lead.id ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
@@ -1144,7 +1353,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                   Gated Community Layouts & Video Tours
                 </h2>
                 <p className="text-xs text-brand-muted mt-1 leading-relaxed max-w-xl">
-                  Add new project layouts, edit starting prices and plot sizes, or attach YouTube drone walkthrough videos. All changes update instantly on the public website.
+                  Add new project layouts, create custom micro-markets, upload photo files, or attach YouTube video tours. All changes reflect live on the website.
                 </p>
               </div>
 
@@ -1202,7 +1411,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                           setPreviewVideoTitle(plot.videoTitle || plot.name);
                         }}
                         className="absolute bottom-3 left-3 bg-black/85 hover:bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 flex items-center gap-1.5 transition-colors cursor-pointer backdrop-blur-xs shadow-md"
-                        title="Click to preview YouTube video player"
+                        title="Click to preview video player"
                       >
                         <Play size={12} className="fill-white" />
                         <span>▶ Watch Attached Video</span>
@@ -1211,10 +1420,10 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                       <button
                         onClick={() => handleEditPlotClick(plot)}
                         className="absolute bottom-3 left-3 bg-black/60 hover:bg-black/85 text-white/90 text-[10px] px-2.5 py-1 font-sans flex items-center gap-1 transition-colors cursor-pointer"
-                        title="Click to attach a YouTube video tour"
+                        title="Click to attach a video tour"
                       >
                         <Plus size={10} />
-                        <span>Attach YouTube Video</span>
+                        <span>Attach Video Tour</span>
                       </button>
                     )}
                   </div>
@@ -1224,7 +1433,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                     <div>
                       <div className="flex items-center gap-1 text-[11px] text-brand-accent font-bold uppercase tracking-wider mb-1">
                         <MapPin size={12} />
-                        <span>{plot.location}</span>
+                        <span className="font-bold">{plot.location}</span>
                         {plot.subLocation && (
                           <span className="text-brand-muted font-normal">• {plot.subLocation}</span>
                         )}
@@ -1295,7 +1504,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
       </main>
 
       {/* ========================================================= */}
-      {/* MODAL: ADD / EDIT PLOT & YOUTUBE VIDEO TOUR               */}
+      {/* MODAL: ADD / EDIT PLOT, UPLOADS & CUSTOM LOCATION         */}
       {/* ========================================================= */}
       {isPlotModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-xs overflow-y-auto">
@@ -1327,11 +1536,11 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                 </div>
               )}
 
-              {/* SECTION 1: BASIC INFORMATION */}
+              {/* SECTION 1: BASIC INFORMATION & DYNAMIC LOCATION CREATION */}
               <div className="space-y-3 pb-4 border-b border-brand-divider">
                 <div className="flex items-center gap-2 text-brand-dark font-bold text-xs uppercase tracking-wider">
                   <Building2 size={14} className="text-brand-accent" />
-                  <span>1. Layout Name & Location</span>
+                  <span>1. Layout Name & Micro-Market Location</span>
                 </div>
 
                 <div>
@@ -1350,21 +1559,82 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold uppercase tracking-wider text-brand-dark mb-1">
-                      Micro-Market Location <span className="text-red-500">*</span>
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold uppercase tracking-wider text-brand-dark">
+                        Micro-Market Location <span className="text-red-500">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsCreatingLocation(!isCreatingLocation)}
+                        className="text-[11px] text-brand-accent hover:text-brand-dark font-bold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus size={12} />
+                        <span>+ New Location</span>
+                      </button>
+                    </div>
+
                     <select
                       value={plotFormData.location}
-                      onChange={(e) => setPlotFormData({ ...plotFormData, location: e.target.value })}
+                      onChange={(e) => {
+                        if (e.target.value === '__NEW_LOCATION__') {
+                          setIsCreatingLocation(true);
+                        } else {
+                          setPlotFormData({ ...plotFormData, location: e.target.value });
+                        }
+                      }}
                       className="w-full bg-brand-canvas px-3.5 py-2.5 border border-brand-divider text-sm outline-none font-medium cursor-pointer"
                     >
-                      <option value="Coimbatore">Coimbatore</option>
-                      <option value="Karamadai">Karamadai</option>
-                      <option value="Annur">Annur</option>
-                      <option value="Kovilpalayam">Kovilpalayam</option>
-                      <option value="Pollachi">Pollachi</option>
-                      <option value="Avinashi">Avinashi (Future Project)</option>
+                      {allAvailableLocations.map(loc => (
+                        <option key={loc} value={loc}>{loc}</option>
+                      ))}
+                      <option disabled>──────────</option>
+                      <option value="__NEW_LOCATION__">➕ + Add New Custom Location...</option>
                     </select>
+
+                    {/* Inline Create New Location Box */}
+                    {isCreatingLocation && (
+                      <div className="mt-2.5 p-3 bg-brand-canvas border border-brand-dark/25 space-y-2">
+                        <label className="block text-[11px] font-bold text-brand-dark uppercase">
+                          Create New Micro-Market Location
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            autoFocus
+                            value={newLocationInput}
+                            onChange={(e) => setNewLocationInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleCreateNewLocation();
+                              }
+                            }}
+                            placeholder="e.g. Sulur, Saravanampatti..."
+                            className="flex-1 bg-white px-3 py-1.5 border border-brand-divider text-xs outline-none focus:border-brand-dark font-medium"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleCreateNewLocation}
+                            className="px-3 py-1.5 bg-brand-dark text-white text-xs font-bold uppercase tracking-wider hover:bg-brand-btn cursor-pointer"
+                          >
+                            Add
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCreatingLocation(false);
+                              setNewLocationInput('');
+                            }}
+                            className="px-3 py-1.5 border border-brand-divider text-xs hover:bg-white cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                        <span className="text-[10px] text-brand-muted block">
+                          Tip: Newly created locations will automatically appear on the website filters!
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -1440,58 +1710,144 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                 </div>
               </div>
 
-              {/* SECTION 3: YOUTUBE VIDEO TOUR (INTERACTIVE PREVIEW!) */}
+              {/* SECTION 3: VIDEO TOUR (YOUTUBE LINK OR VIDEO FILE UPLOAD) */}
               <div className="p-4 bg-gradient-to-br from-amber-50/70 to-orange-50/40 border border-amber-300 rounded-none space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Film size={16} className="text-amber-800" />
                     <span className="font-bold uppercase tracking-wider text-amber-950 text-xs">
-                      3. YouTube Drone Walkthrough Video
+                      3. Video Tour Walkthrough
                     </span>
                   </div>
-                  <span className="text-[10px] text-amber-800 bg-amber-200/60 px-2 py-0.5 font-bold uppercase">
-                    Auto-Embeds
-                  </span>
+                  
+                  {/* Video Input Mode Toggle */}
+                  <div className="flex items-center border border-amber-300 bg-white">
+                    <button
+                      type="button"
+                      onClick={() => setVideoInputMode('youtube')}
+                      className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                        videoInputMode === 'youtube'
+                          ? 'bg-amber-900 text-white'
+                          : 'text-amber-900 hover:bg-amber-50'
+                      }`}
+                    >
+                      YouTube Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVideoInputMode('upload')}
+                      className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                        videoInputMode === 'upload'
+                          ? 'bg-amber-900 text-white'
+                          : 'text-amber-900 hover:bg-amber-50'
+                      }`}
+                    >
+                      Upload Video File
+                    </button>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block font-bold text-amber-950 mb-1">
-                    YouTube URL (Watch link or Share link)
-                  </label>
-                  <input
-                    type="text"
-                    value={plotFormData.videoUrl}
-                    onChange={(e) => setPlotFormData({ ...plotFormData, videoUrl: e.target.value })}
-                    placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/..."
-                    className="w-full bg-white px-3.5 py-2.5 border border-amber-300 text-sm outline-none font-mono text-stone-900"
-                  />
-                  <span className="text-[11px] text-amber-900 mt-1 block">
-                    Copy and paste any YouTube link from your videographer or smartphone.
-                  </span>
-                </div>
+                {/* MODE A: YOUTUBE LINK */}
+                {videoInputMode === 'youtube' && (
+                  <div className="space-y-2">
+                    <label className="block font-bold text-amber-950 mb-1">
+                      YouTube URL (Watch link or Share link)
+                    </label>
+                    <input
+                      type="text"
+                      value={plotFormData.videoUrl}
+                      onChange={(e) => setPlotFormData({ ...plotFormData, videoUrl: e.target.value })}
+                      placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/..."
+                      className="w-full bg-white px-3.5 py-2.5 border border-amber-300 text-sm outline-none font-mono text-stone-900"
+                    />
+                    <span className="text-[11px] text-amber-900 block">
+                      Copy and paste any YouTube link from your videographer or smartphone.
+                    </span>
 
-                {/* Live YouTube Preview inside the Modal! */}
-                {getEmbedUrl(plotFormData.videoUrl) ? (
-                  <div className="mt-3 p-3 bg-white border border-amber-300 space-y-2">
-                    <div className="flex items-center gap-2 text-emerald-700 font-bold text-[11px]">
-                      <CheckCircle2 size={14} />
-                      <span>✓ Valid YouTube Video Detected! Live Player Preview:</span>
-                    </div>
-                    <div className="relative aspect-[16/9] w-full bg-black overflow-hidden shadow-inner">
-                      <iframe
-                        src={getEmbedUrl(plotFormData.videoUrl)}
-                        title="Live Video Preview"
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
+                    {/* Live YouTube Preview inside the Modal! */}
+                    {getEmbedUrl(plotFormData.videoUrl) ? (
+                      <div className="mt-3 p-3 bg-white border border-amber-300 space-y-2">
+                        <div className="flex items-center gap-2 text-emerald-700 font-bold text-[11px]">
+                          <CheckCircle2 size={14} />
+                          <span>✓ Valid YouTube Video Detected! Live Player Preview:</span>
+                        </div>
+                        <div className="relative aspect-[16/9] w-full bg-black overflow-hidden shadow-inner">
+                          <iframe
+                            src={getEmbedUrl(plotFormData.videoUrl)}
+                            title="Live Video Preview"
+                            className="w-full h-full border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                ) : plotFormData.videoUrl ? (
-                  <div className="text-[11px] text-amber-800 bg-white p-2 border border-amber-200">
-                    ℹ️ Direct video link entered. It will play via HTML5 video player.
+                )}
+
+                {/* MODE B: UPLOAD VIDEO FILE */}
+                {videoInputMode === 'upload' && (
+                  <div className="space-y-3">
+                    <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-amber-300 bg-white hover:bg-amber-50/50 transition-colors cursor-pointer text-center">
+                      <FileVideo size={28} className="text-amber-800 mb-2" />
+                      <span className="text-xs font-bold text-amber-950">
+                        {isProcessingVideo ? 'Reading video file...' : 'Click to select MP4 / WebM video file'}
+                      </span>
+                      <span className="text-[11px] text-amber-800 mt-1">
+                        Select video file from your phone gallery or drone folder
+                      </span>
+                      <input
+                        type="file"
+                        accept="video/mp4,video/webm,video/quicktime"
+                        className="hidden"
+                        onChange={handleVideoFileUpload}
+                        disabled={isProcessingVideo}
+                      />
+                    </label>
+
+                    {/* Uploaded Video File Preview & Details */}
+                    {plotFormData.videoUrl && !getEmbedUrl(plotFormData.videoUrl) && (
+                      <div className="p-3 bg-white border border-amber-300 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
+                            <Video size={14} className="text-amber-800" />
+                            <span>{uploadedVideoInfo?.name || 'Attached Video File'}</span>
+                            {uploadedVideoInfo?.sizeMB && (
+                              <span className="text-[10px] text-amber-800 font-mono">({uploadedVideoInfo.sizeMB} MB)</span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPlotFormData(prev => ({ ...prev, videoUrl: '' }));
+                              setUploadedVideoInfo(null);
+                            }}
+                            className="text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        {/* HTML5 Live Video Player */}
+                        <div className="relative aspect-[16/9] w-full bg-black overflow-hidden shadow-inner">
+                          <video
+                            src={plotFormData.videoUrl}
+                            controls
+                            className="w-full h-full object-cover"
+                          >
+                            Your browser does not support HTML5 video preview.
+                          </video>
+                        </div>
+
+                        {uploadedVideoInfo?.isTooLargeForServerless && (
+                          <div className="p-2 bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-relaxed">
+                            💡 <strong>Tip for Large Files:</strong> This video ({uploadedVideoInfo.sizeMB} MB) can be previewed locally. For live website hosting with zero buffering, uploading to YouTube and pasting the link in the "YouTube Link" tab is strongly recommended.
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                ) : null}
+                )}
 
                 <div>
                   <label className="block font-bold text-amber-950 mb-1">
@@ -1507,38 +1863,126 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
                 </div>
               </div>
 
-              {/* SECTION 4: COVER IMAGE */}
+              {/* SECTION 4: COVER IMAGE (DIRECT FILE UPLOAD OR URL) */}
               <div className="space-y-3 pb-4 border-b border-brand-divider">
                 <div className="flex items-center justify-between">
-                  <label className="block font-bold uppercase tracking-wider text-brand-dark">
-                    4. Layout Cover Image URL <span className="text-red-500">*</span>
-                  </label>
-                  <span className="text-[11px] text-brand-muted">Or pick a sample preset below:</span>
-                </div>
+                  <div className="flex items-center gap-2 text-brand-dark font-bold text-xs uppercase tracking-wider">
+                    <ImageIcon size={14} className="text-brand-accent" />
+                    <span>4. Layout Cover Photo</span>
+                  </div>
 
-                <input
-                  type="text"
-                  required
-                  value={plotFormData.imageUrl}
-                  onChange={(e) => setPlotFormData({ ...plotFormData, imageUrl: e.target.value })}
-                  placeholder="https://... or /images/kubera-hero-layout.jpg"
-                  className="w-full bg-brand-canvas px-3.5 py-2.5 border border-brand-divider text-sm outline-none font-mono"
-                />
-
-                {/* Quick Preset Buttons */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[10px] font-bold text-brand-muted uppercase mr-1">Presets:</span>
-                  {SAMPLE_PHOTO_PRESETS.map((preset) => (
+                  {/* Image Input Mode Toggle */}
+                  <div className="flex items-center border border-brand-divider bg-brand-canvas">
                     <button
-                      key={preset.label}
                       type="button"
-                      onClick={() => setPlotFormData({ ...plotFormData, imageUrl: preset.url })}
-                      className="px-2 py-1 text-[10px] bg-brand-canvas hover:bg-brand-dark hover:text-white border border-brand-divider transition-colors cursor-pointer"
+                      onClick={() => setImageInputMode('upload')}
+                      className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                        imageInputMode === 'upload'
+                          ? 'bg-brand-dark text-white'
+                          : 'text-brand-dark hover:bg-brand-white'
+                      }`}
                     >
-                      {preset.label}
+                      📁 Upload File
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('url')}
+                      className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                        imageInputMode === 'url'
+                          ? 'bg-brand-dark text-white'
+                          : 'text-brand-dark hover:bg-brand-white'
+                      }`}
+                    >
+                      🌐 URL / Presets
+                    </button>
+                  </div>
                 </div>
+
+                {/* MODE A: UPLOAD IMAGE FILE */}
+                {imageInputMode === 'upload' && (
+                  <div className="space-y-3">
+                    <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-brand-divider hover:border-brand-dark bg-brand-canvas/60 hover:bg-brand-canvas transition-colors cursor-pointer text-center">
+                      <Upload size={28} className="text-brand-accent mb-2" />
+                      <span className="text-xs font-bold text-brand-dark">
+                        {isProcessingImage ? 'Optimizing image...' : 'Click to select or drag & drop photo'}
+                      </span>
+                      <span className="text-[11px] text-brand-muted mt-1">
+                        Select JPG, PNG, or WEBP from your phone camera or computer. Automatically optimized for web.
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageFileUpload}
+                        disabled={isProcessingImage}
+                      />
+                    </label>
+
+                    {/* Uploaded Image Preview Box */}
+                    {plotFormData.imageUrl && (
+                      <div className="p-3 bg-brand-canvas border border-brand-divider flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={plotFormData.imageUrl}
+                            alt="Preview"
+                            className="w-16 h-12 object-cover border border-brand-divider bg-zinc-100"
+                          />
+                          <div>
+                            <span className="font-bold text-brand-dark block text-xs">
+                              {uploadedImageInfo?.name || 'Cover Photo Ready'}
+                            </span>
+                            <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1 mt-0.5">
+                              <CheckCircle size={12} />
+                              <span>Ready for website {uploadedImageInfo?.sizeKB ? `(${uploadedImageInfo.sizeKB} KB)` : ''}</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        <label className="text-xs text-brand-dark hover:text-brand-accent font-bold underline cursor-pointer">
+                          Change
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageFileUpload}
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* MODE B: URL OR PRESETS */}
+                {imageInputMode === 'url' && (
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      required
+                      value={plotFormData.imageUrl}
+                      onChange={(e) => setPlotFormData({ ...plotFormData, imageUrl: e.target.value })}
+                      placeholder="https://... or /images/kubera-hero-layout.jpg"
+                      className="w-full bg-brand-canvas px-3.5 py-2.5 border border-brand-divider text-sm outline-none font-mono"
+                    />
+
+                    {/* Quick Preset Buttons */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      <span className="text-[10px] font-bold text-brand-muted uppercase mr-1">Presets:</span>
+                      {SAMPLE_PHOTO_PRESETS.map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setPlotFormData({ ...plotFormData, imageUrl: preset.url });
+                            triggerToast(`Preset selected: ${preset.label}`);
+                          }}
+                          className="px-2 py-1 text-[10px] bg-brand-canvas hover:bg-brand-dark hover:text-white border border-brand-divider transition-colors cursor-pointer"
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* SECTION 5: DESCRIPTION */}
@@ -1567,7 +2011,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
 
                 <button
                   type="submit"
-                  disabled={isSavingPlot}
+                  disabled={isSavingPlot || isProcessingImage || isProcessingVideo}
                   className="bg-brand-dark hover:bg-brand-btn text-white px-6 py-3 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-md disabled:opacity-50"
                 >
                   {isSavingPlot ? (
@@ -1598,7 +2042,7 @@ const AdminPortal = ({ onBackToSite, onRefreshPlots }) => {
               <div className="flex items-center gap-2">
                 <Film size={16} className="text-brand-accent" />
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-dark">
-                  Video Tour Preview: {previewVideoTitle || 'Layout Drone Walkthrough'}
+                  Video Tour Preview: {previewVideoTitle || 'Layout Walkthrough'}
                 </span>
               </div>
               <button
